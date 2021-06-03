@@ -1,0 +1,159 @@
+mkdir -p /project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/cache/openlane
+make -C /project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/cache/openlane -f /project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/mkdv.mk \
+	MKDV_RUNDIR=/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/rundir \
+	MKDV_CACHEDIR=/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/cache/openlane \
+	build-openlane || (echo "FAIL: exit status $?" > status.txt; exit 1)
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/cache/openlane'
+make[1]: Nothing to be done for 'build-openlane'.
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/cache/openlane'
+INCFILES: /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_ncsim.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_icestorm.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_vcs.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_icarus.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_cocotb.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_vlsim.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_openlane.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_questa.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_quartus.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_sby.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_pybfms.mk sby questa icestorm vlsim quartus openlane icarus questa icestorm quartus openlane cocotb pybfms
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/rundir'
+Pre-Run:  openlane-copy-results
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/rundir'
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/rundir'
+mkdir -p `dirname /project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/rundir/user_project_wrapper/config.tcl`
+cp /project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper//config.tcl /project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/rundir/user_project_wrapper/config.tcl
+docker run -it -v /project/fun/openlane/openlane-develop:/openLANE_flow \
+	-v /project/fun/openlane/pdk-develop:/project/fun/openlane/pdk-develop \
+	-v /project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/rundir:/mkdv_rundir \
+	-v /project/fun/openlane/clusterv-soc/caravel/openlane/user_project_wrapper_empty:/project/fun/openlane/clusterv-soc/caravel/openlane/user_project_wrapper_empty -v /project/fun/openlane/clusterv-soc/gds:/project/fun/openlane/clusterv-soc/gds -v /project/fun/openlane/clusterv-soc/lef:/project/fun/openlane/clusterv-soc/lef -v /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl:/project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl -v /project/fun/openlane/clusterv-soc/packages/fwprotocol-defs/verilog/rtl:/project/fun/openlane/clusterv-soc/packages/fwprotocol-defs/verilog/rtl -v /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl:/project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl -v /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/include:/project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/include -v /project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8:/project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8 -v /project/fun/openlane/clusterv-soc/verilog/rtl:/project/fun/openlane/clusterv-soc/verilog/rtl -v /project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper:/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper \
+	-e PDK_ROOT=/project/fun/openlane/pdk-develop -e DESIGN_NAME=user_project_wrapper -e SYNTH_DIR=/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper -e VERILOG_FILES="/project/fun/openlane/clusterv-soc/verilog/rtl//user_project_wrapper.v /project/fun/openlane/clusterv-soc/verilog/rtl//clusterv_soc.v /project/fun/openlane/clusterv-soc/verilog/rtl//clusterv_periph_subsys.v /project/fun/openlane/clusterv-soc/verilog/rtl//clusterv_tile.v /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_decode.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_c_decode.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_rv32imca_wb.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_wb.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_rv32im.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_regfile.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_rv32i.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_fetch.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_exec.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_rv32ic.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_mul_div_shift.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_mul_fast.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_rv32imc.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_shift_fast.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_tracer.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_rv32i_wb.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_alu.sv /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl/fwrisc_mem.sv /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl/wb_interconnect_arb.v /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl/wb_interconnect_NxN.v /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl/wb_interconnect_tag_1xN_pt.v /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl/wb_interconnect_tag_NxN.v /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl/wb_interconnect_1xN.v /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl/wb_interconnect_tag_NxN_dbg.v /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl/wb_interconnect_tag_1xN.v" -e VERILOG_FILES_BLACKBOX="/project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v"  -e VERILOG_INCLUDE_DIRS="/project/fun/openlane/clusterv-soc/packages/fwprotocol-defs/verilog/rtl /project/fun/openlane/clusterv-soc/packages/fwrisc/verilog/rtl /project/fun/openlane/clusterv-soc/packages/fwprotocol-defs/verilog/rtl /project/fun/openlane/clusterv-soc/packages/fwprotocol-defs/verilog/rtl /project/fun/openlane/clusterv-soc/packages/fw-wishbone-interconnect/verilog/rtl /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/../include" -e SYNTH_DEFINES="" -e EXTRA_LEFS="/project/fun/openlane/clusterv-soc/lef/clusterv_tile.lef /project/fun/openlane/clusterv-soc/lef/clusterv_tile.lef /project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.lef" -e EXTRA_GDS_FILES="/project/fun/openlane/clusterv-soc/gds/clusterv_tile.gds /project/fun/openlane/clusterv-soc/gds/clusterv_tile.gds /project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.gds" \
+	 \
+	openlane:current sh -c "cd /mkdv_rundir && pwd && ls && flow.tcl -design ./user_project_wrapper -save_path . -save -tag user_project_wrapper -overwrite"
+Emulate Docker CLI using podman. Create /etc/containers/nodocker to quiet msg.
+/mkdv_rundir
+user_project_wrapper
+[36m[INFO]: 
+	 ___   ____   ___  ____   _       ____  ____     ___
+	/   \ |    \ /  _]|    \ | |     /    ||    \   /  _]
+	|   | |  o  )  [_ |  _  || |    |  o  ||  _  | /  [_
+	| O | |   _/    _]|  |  || |___ |     ||  |  ||    _]
+	|   | |  | |   [_ |  |  ||     ||  _  ||  |  ||   [_
+	\___/ |__| |_____||__|__||_____||__|__||__|__||_____|
+
+[39m
+[36m[INFO]: Version: v0.14-38-g9ebb1ee[39m
+[36m[INFO]: Running non-interactively[39m
+[36m[INFO]: Using design configuration at /mkdv_rundir/user_project_wrapper/config.tcl[39m
+[36m[INFO]: Sourcing Configurations from /mkdv_rundir/user_project_wrapper/config.tcl[39m
+[36m[INFO]: PDKs root directory: /project/fun/openlane/pdk-develop[39m
+[36m[INFO]: PDK: sky130A[39m
+[36m[INFO]: Setting PDKPATH to /project/fun/openlane/pdk-develop/sky130A[39m
+[36m[INFO]: Standard Cell Library: sky130_fd_sc_hd[39m
+[36m[INFO]: Sourcing Configurations from /mkdv_rundir/user_project_wrapper/config.tcl[39m
+[36m[INFO]: Current run directory is /mkdv_rundir/user_project_wrapper/runs/user_project_wrapper[39m
+[36m[INFO]: Preparing LEF Files[39m
+[36m[INFO]: Extracting the number of available metal layers from /project/fun/openlane/pdk-develop/sky130A/libs.ref/sky130_fd_sc_hd/techlef/sky130_fd_sc_hd.tlef[39m
+[36m[INFO]: The number of available metal layers is 6[39m
+[36m[INFO]: The available metal layers are li1 met1 met2 met3 met4 met5[39m
+[36m[INFO]: Merging LEF Files...[39m
+mergeLef.py : Merging LEFs
+sky130_ef_sc_hd__decap_12.lef: SITEs matched found: 0
+sky130_ef_sc_hd__decap_12.lef: MACROs matched found: 1
+sky130_ef_sc_hd__fakediode_2.lef: SITEs matched found: 0
+sky130_ef_sc_hd__fakediode_2.lef: MACROs matched found: 1
+sky130_ef_sc_hd__fill_12.lef: SITEs matched found: 0
+sky130_ef_sc_hd__fill_12.lef: MACROs matched found: 1
+sky130_fd_sc_hd.lef: SITEs matched found: 0
+sky130_fd_sc_hd.lef: MACROs matched found: 437
+mergeLef.py : Merging LEFs complete
+mergeLef.py : Merging LEFs
+clusterv_tile.lef: SITEs matched found: 0
+clusterv_tile.lef: MACROs matched found: 1
+clusterv_tile.lef: SITEs matched found: 0
+clusterv_tile.lef: MACROs matched found: 1
+sky130_sram_1kbyte_1rw1r_32x256_8.lef: SITEs matched found: 0
+sky130_sram_1kbyte_1rw1r_32x256_8.lef: MACROs matched found: 1
+mergeLef.py : Merging LEFs complete
+[36m[INFO]: Merging the following extra LEFs: /project/fun/openlane/clusterv-soc/lef/clusterv_tile.lef /project/fun/openlane/clusterv-soc/lef/clusterv_tile.lef /project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.lef[39m
+[36m[INFO]: Trimming Liberty...[39m
+[36m[INFO]: Generating Exclude List...[39m
+[36m[INFO]: Storing configs into config.tcl ...[39m
+[36m[INFO]: Preparation complete[39m
+[36m[INFO]: Running Synthesis...[39m
+[36m[INFO]: current step index: 1[39m
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Wolf <claire@symbioticeda.com>          |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.9+3621 (git sha1 84e9fa7, gcc 8.3.1 -fPIC -Os)
+
+[TCL: yosys -import] Command name collision: found pre-existing command `cd' -> skip.
+[TCL: yosys -import] Command name collision: found pre-existing command `eval' -> skip.
+[TCL: yosys -import] Command name collision: found pre-existing command `exec' -> skip.
+[TCL: yosys -import] Command name collision: found pre-existing command `read' -> skip.
+[TCL: yosys -import] Command name collision: found pre-existing command `trace' -> skip.
+
+1. Executing Verilog-2005 frontend: /project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v
+Parsing Verilog input from `/project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v' to AST representation.
+Generating RTLIL representation for module `\sky130_sram_1kbyte_1rw1r_32x256_8'.
+/project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v:0: Warning: System task `$display' outside initial block is unsupported.
+/project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v:0: Warning: System task `$display' outside initial block is unsupported.
+/project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v:0: Warning: System task `$display' outside initial block is unsupported.
+/project/fun/openlane/clusterv-soc/packages/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v:0: Warning: System task `$display' outside initial block is unsupported.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /project/fun/openlane/clusterv-soc/verilog/rtl//user_project_wrapper.v
+ERROR: Can't open include file `wishbone_tag_macros.svh'!
+[31m[ERROR]: during executing: "yosys -c /openLANE_flow/scripts/synth_top.tcl -l /mkdv_rundir/user_project_wrapper/runs/user_project_wrapper/logs/synthesis/1-yosys.log |& tee >&@stdout"[39m
+[31m[ERROR]: Exit code: 1[39m
+[31m[ERROR]: Last 10 lines:
+child process exited abnormally
+[39m
+[31m[ERROR]: Please check yosys  log file[39m
+[31m[ERROR]: Dumping to /mkdv_rundir/user_project_wrapper/runs/user_project_wrapper/error.log[39m
+[36m[INFO]: Calculating Runtime From the Start...[39m
+[36m[INFO]: Flow failed for user_project_wrapper/03-06_00-55 in 0h0m0s[39m
+[36m[INFO]: Generating Final Summary Report...[39m
+[36m[INFO]: Design Name: user_project_wrapper
+Run Directory: /mkdv_rundir/user_project_wrapper/runs/user_project_wrapper
+Source not found.
+----------------------------------------
+
+LVS Summary:
+Source: /mkdv_rundir/user_project_wrapper/runs/user_project_wrapper/results/lvs/user_project_wrapper.lvs_parsed.gds.log
+Source not found.
+----------------------------------------
+
+Antenna Summary:
+No antenna report found.[39m
+[36m[INFO]: check full report here: /mkdv_rundir/user_project_wrapper/runs/user_project_wrapper/reports/final_summary_report.csv[39m
+[36m[INFO]: Saving Runtime Environment[39m
+[31m[ERROR]: Flow Failed.[39m
+
+    while executing
+"try_catch [get_yosys_bin]  -c $::env(SYNTH_SCRIPT)  -l [index_file $::env(yosys_log_file_tag).log 0]  |& tee $::env(TERMINAL_OUTPUT)"
+    (procedure "run_yosys" line 34)
+    invoked from within
+"run_yosys"
+    (procedure "run_synthesis" line 9)
+    invoked from within
+"[lindex $step_exe 0] [lindex $step_exe 1] "
+    (procedure "run_non_interactive_mode" line 43)
+    invoked from within
+"run_non_interactive_mode {*}$argv"
+    invoked from within
+"if { [info exists flags_map(-interactive)] || [info exists flags_map(-it)] } {
+	puts_info "Running interactively"
+	if { [info exists arg_values(-file)..."
+    (file "/openLANE_flow/flow.tcl" line 344)
+make[1]: *** [/project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_openlane.mk:79: run-openlane] Error 1
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/synth/user_project_wrapper/rundir'
+make: *** [/project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/dv.mk:80: run] Error 1

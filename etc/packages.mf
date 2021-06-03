@@ -1,2 +1,11 @@
 
-
+fwprotocol-defs@ssh://github.com:Featherweight-IP/fwprotocol-defs.git
+fw-local-intc@ssh://github.com:Featherweight-IP/fw-local-intc.git
+fwperiph-dma@ssh://github.com:Featherweight-IP/fwperiph-dma.git
+fw-wishbone-interconnect@ssh://github.com:Featherweight-IP/fw-wishbone-interconnect.git
+fw-wishbone-sram-ctrl@ssh://github.com:Featherweight-IP/fw-wishbone-sram-ctrl.git
+fwgpio@ssh://github.com:Featherweight-IP/fwgpio.git
+fwrisc@ssh://github.com:Featherweight-IP/fwrisc.git
+fwspi-initiator@ssh://github.com:Featherweight-IP/fwspi-initiator.git
+fwuart-16550@ssh://github.com:Featherweight-IP/fwuart-16550.git
+sky130_sram_macros@ssh://github.com:efabless/sky130_sram_macros.git

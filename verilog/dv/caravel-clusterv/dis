@@ -1,0 +1,102 @@
+
+rundir/asm/smoke.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .flash_bootstrap:
+
+10000000 <init_copy_loop>:
+10000000:	00000097          	auipc	ra,0x0
+10000004:	01808093          	addi	ra,ra,24 # 10000018 <_ld_ram_bootstrap>
+10000008:	f0000117          	auipc	sp,0xf0000
+1000000c:	ff810113          	addi	sp,sp,-8 # 0 <_ram_bootstrap>
+10000010:	f0000197          	auipc	gp,0xf0000
+10000014:	12418193          	addi	gp,gp,292 # 134 <_etext>
+
+Disassembly of section .ram_bootstrap:
+
+00000000 <_ram_bootstrap>:
+   0:	10000097          	auipc	ra,0x10000
+   4:	02808093          	addi	ra,ra,40 # 10000028 <_ldtext>
+   8:	00000117          	auipc	sp,0x0
+   c:	00810113          	addi	sp,sp,8 # 10 <_e_ram_bootstrap>
+
+Disassembly of section .text:
+
+00000010 <_text>:
+  10:	10000097          	auipc	ra,0x10000
+  14:	01808093          	addi	ra,ra,24 # 10000028 <_ldtext>
+  18:	00000117          	auipc	sp,0x0
+  1c:	ff810113          	addi	sp,sp,-8 # 10 <_text>
+  20:	00000197          	auipc	gp,0x0
+  24:	05418193          	addi	gp,gp,84 # 74 <copy_loop>
+  28:	40218233          	sub	tp,gp,sp
+  2c:	004080b3          	add	ra,ra,tp
+  30:	00000217          	auipc	tp,0x0
+  34:	07020213          	addi	tp,tp,112 # a0 <e_copy_loop>
+  38:	100002b7          	lui	t0,0x10000
+  3c:	405080b3          	sub	ra,ra,t0
+  40:	405181b3          	sub	gp,gp,t0
+  44:	40520233          	sub	tp,tp,t0
+  48:	0000a283          	lw	t0,0(ra)
+  4c:	0051a023          	sw	t0,0(gp)
+  50:	00418863          	beq	gp,tp,60 <_text+0x50>
+  54:	00408093          	addi	ra,ra,4
+  58:	00418193          	addi	gp,gp,4
+  5c:	fedff06f          	j	48 <_text+0x38>
+  60:	00000117          	auipc	sp,0x0
+  64:	01410113          	addi	sp,sp,20 # 74 <copy_loop>
+  68:	100001b7          	lui	gp,0x10000
+  6c:	40310133          	sub	sp,sp,gp
+  70:	00010067          	jr	sp
+
+00000074 <copy_loop>:
+  74:	10000097          	auipc	ra,0x10000
+  78:	fb408093          	addi	ra,ra,-76 # 10000028 <_ldtext>
+  7c:	00000117          	auipc	sp,0x0
+  80:	f9410113          	addi	sp,sp,-108 # 10 <_text>
+  84:	00000197          	auipc	gp,0x0
+  88:	0b018193          	addi	gp,gp,176 # 134 <_etext>
+  8c:	0000a203          	lw	tp,0(ra)
+  90:	00412023          	sw	tp,0(sp)
+  94:	00310663          	beq	sp,gp,a0 <e_copy_loop>
+  98:	00408093          	addi	ra,ra,4
+  9c:	00410113          	addi	sp,sp,4
+
+000000a0 <e_copy_loop>:
+  a0:	00000093          	li	ra,0
+  a4:	00000113          	li	sp,0
+  a8:	00000193          	li	gp,0
+  ac:	00000213          	li	tp,0
+  b0:	00000293          	li	t0,0
+  b4:	00000313          	li	t1,0
+  b8:	00000393          	li	t2,0
+  bc:	00000413          	li	s0,0
+  c0:	00000493          	li	s1,0
+  c4:	00000513          	li	a0,0
+  c8:	00000593          	li	a1,0
+  cc:	00000613          	li	a2,0
+  d0:	00000693          	li	a3,0
+  d4:	00000713          	li	a4,0
+  d8:	00000793          	li	a5,0
+  dc:	00000813          	li	a6,0
+  e0:	00000893          	li	a7,0
+  e4:	00000913          	li	s2,0
+  e8:	00000993          	li	s3,0
+  ec:	00000a13          	li	s4,0
+  f0:	00000a93          	li	s5,0
+  f4:	00000b13          	li	s6,0
+  f8:	00000b93          	li	s7,0
+  fc:	00000c13          	li	s8,0
+ 100:	00000c93          	li	s9,0
+ 104:	00000d13          	li	s10,0
+ 108:	00000d93          	li	s11,0
+ 10c:	00000e13          	li	t3,0
+ 110:	00000e93          	li	t4,0
+ 114:	00000f13          	li	t5,0
+ 118:	00000f93          	li	t6,0
+ 11c:	00108093          	addi	ra,ra,1
+ 120:	ffdff06f          	j	11c <e_copy_loop+0x7c>
+ 124:	00000013          	nop
+ 128:	00000013          	nop
+ 12c:	00000013          	nop
+ 130:	00000013          	nop
