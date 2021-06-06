@@ -13,6 +13,7 @@ vlsim
 -e git+ssh://git@github.com/pybfms/pybfms-core-debug-common.git#egg=pybfms-core-debug-common
 -e git+ssh://git@github.com/pybfms/pybfms_riscv_debug.git#egg=pybfms_riscv_debug
 -e git+ssh://git@github.com/pybfms/pybfms-spi.git#egg=pybfms-spi
+-e git+ssh://git@github.com/pybfms/pybfms-wishbone.git#egg=pybfms-wishbone
 
 -e git+ssh://git@github.com/fvutils/mkdv.git#egg=mkdv
 

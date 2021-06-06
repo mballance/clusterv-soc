@@ -20,7 +20,7 @@ set ::env(RUN_KLAYOUT) 0
 
 set ::env(CLOCK_PORT) "clock"
 set ::env(CLOCK_NET) "clock"
-set ::env(CLOCK_PERIOD) "30"
+set ::env(CLOCK_PERIOD) "20"
 
 set ::env(FP_SIZING) absolute
 set ::env(DIE_AREA) "0 0 600 500"

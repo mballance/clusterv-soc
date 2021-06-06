@@ -1,0 +1,52 @@
+mkdir -p /project/fun/openlane/clusterv-soc/verilog/dv/clusterv/cache/icarus
+make -C /project/fun/openlane/clusterv-soc/verilog/dv/clusterv/cache/icarus -f /project/fun/openlane/clusterv-soc/verilog/dv/clusterv/mkdv.mk \
+	MKDV_RUNDIR=/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir \
+	MKDV_CACHEDIR=/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/cache/icarus \
+	build-icarus || (echo "FAIL: exit status $?" > status.txt; exit 1)
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/cache/icarus'
+make[1]: Nothing to be done for 'build-icarus'.
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/cache/icarus'
+INCFILES: /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_ncsim.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_icestorm.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_vcs.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_icarus.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_cocotb.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_vlsim.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_openlane.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_questa.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_quartus.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_sby.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_pybfms.mk sby questa icestorm vlsim quartus openlane icarus questa icestorm quartus openlane cocotb pybfms
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir'
+Pre-Run:  
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir'
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir'
+     -.--ns INFO     cocotb.gpi                         ..mbed/gpi_embed.cpp:77   in set_program_name_in_venv        Did not detect Python virtual environment. Using system-wide Python interpreter
+     -.--ns INFO     cocotb.gpi                         ../gpi/GpiCommon.cpp:105  in gpi_print_registered_impl       VPI registered
+     -.--ns INFO     cocotb.gpi                         ..mbed/gpi_embed.cpp:240  in _embed_sim_init                 Python interpreter initialized and cocotb loaded!
+     0.00ns INFO     Running on Icarus Verilog version 11.0 (stable)
+     0.00ns INFO     Running tests with cocotb v1.5.2 from /project/fun/openlane/clusterv-soc/packages/python/lib64/python3.6/site-packages/cocotb
+     0.00ns INFO     Seeding Python random module with 1622853809
+     0.00ns WARNING  Pytest not found, assertion rewriting will not occur
+     0.00ns INFO     Found test clusterv_tests.clusterv_test_base.entry
+     0.00ns INFO     Running test 1/1: entry
+     0.00ns INFO     Starting test: "entry"
+                     Description: None
+/project/fun/openlane/clusterv-soc/packages/pybfms/src/pybfms/backend.py:50: RuntimeWarning: Timer setup with value 0, which might exhibit undefined behavior in some simulators
+  return Timer(time_ps, units)
+BFM: clusterv_tb.u_mgmt_bfm : wishbone_bfms.wb_initiator_bfm.WbInitiatorBfm
+mgmt_bfm=<wishbone_bfms.wb_initiator_bfm.WbInitiatorBfm object at 0x7f56f5621d30>
+bfm: <wishbone_bfms.wb_initiator_bfm.WbInitiatorBfm object at 0x7f56f5621d30>
+  1000.00ns INFO     Test Passed: entry
+  1000.00ns INFO     Passed 1 tests (0 skipped)
+  1000.00ns INFO     *************************************************************************************************
+                     ** TEST                                     PASS/FAIL  SIM TIME(NS)  REAL TIME(S)  RATIO(NS/S) **
+                     *************************************************************************************************
+                     ** clusterv_tests.clusterv_test_base.entry    PASS         1000.00          0.00    259211.93  **
+                     *************************************************************************************************
+                     
+  1000.00ns INFO     *************************************************************************************
+                     **                                 ERRORS : 0                                      **
+                     *************************************************************************************
+                     **                               SIM TIME : 1000.00 NS                             **
+                     **                              REAL TIME : 0.01 S                                 **
+                     **                        SIM / REAL TIME : 116476.21 NS/S                         **
+                     *************************************************************************************
+                     
+  1000.00ns INFO     Shutting down...
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir'
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir'
+Post-Run: 
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir'
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir'
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/clusterv/rundir'

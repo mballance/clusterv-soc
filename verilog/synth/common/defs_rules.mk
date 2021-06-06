@@ -6,6 +6,7 @@ DV_MK := $(shell PATH=$(PACKAGES_DIR)/python/bin:$(PATH) python3 -m mkdv mkfile)
 ifneq (1,$(RULES))
 
 #MKDV_VL_DEFINES += USE_POWER_PINS
+MKDV_VL_INCDIRS += $(CLUSTERV_SOC_DIR)/caravel
 
 include $(PACKAGES_DIR)/fwprotocol-defs/verilog/rtl/defs_rules.mk
 #MKDV_VL_SRCS_BB += $(PACKAGES_DIR)/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v

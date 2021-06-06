@@ -20,6 +20,19 @@ set script_dir [file dirname [file normalize [info script]]]
 source $::env(SYNTH_DIR)/../../../caravel/openlane/user_project_wrapper_empty/fixed_wrapper_cfgs.tcl
 
 set ::env(DESIGN_NAME) user_project_wrapper
+set ::env(RUN_KLAYOUT) 0
+
+# magic drc checking on the sram block shows millions of false errors
+set ::env(MAGIC_DRC_USE_GDS) 0
+
+## Routing configurations
+set ::env(GLB_RT_ADJUSTMENT) 0.38
+set ::env(GLB_RT_MAXLAYER) 5
+
+set ::env(GLB_RT_OBS) "
+        met4 1313 1690 1623 2084"
+
+
 #section end
 
 # User Configurations
@@ -55,8 +68,8 @@ set ::env(GLB_RT_MAXLAYER) 5
 set ::env(FP_PDN_CHECK_NODES) 0
 
 # The following is because there are no std cells in the example wrapper project.
-set ::env(SYNTH_TOP_LEVEL) 1
-set ::env(PL_RANDOM_GLB_PLACEMENT) 1
+#set ::env(SYNTH_TOP_LEVEL) 1
+#set ::env(PL_RANDOM_GLB_PLACEMENT) 1
 
 set ::env(PL_RESIZER_DESIGN_OPTIMIZATIONS) 0
 set ::env(PL_RESIZER_TIMING_OPTIMIZATIONS) 0
@@ -66,4 +79,4 @@ set ::env(PL_RESIZER_BUFFER_OUTPUT_PORTS) 0
 set ::env(DIODE_INSERTION_STRATEGY) 0
 set ::env(FILL_INSERTION) 0
 set ::env(TAP_DECAP_INSERTION) 0
-set ::env(CLOCK_TREE_SYNTH) 0
+#set ::env(CLOCK_TREE_SYNTH) 0

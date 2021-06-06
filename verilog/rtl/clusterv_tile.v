@@ -2,7 +2,7 @@
  * clusterv_tile.v
  ****************************************************************************/
 `include "wishbone_tag_macros.svh"
-`include "sky130_openram_macros.svh"
+`include "generic_sram_byte_en_macros.svh"
 
 /**
  * Module: clusterv_tile
@@ -26,7 +26,7 @@ module clusterv_tile(
 		input[31:0]		hartid,
 		input[31:0]     resvec,
 		`WB_TAG_INITIATOR_PORT(i_, 32, 32, 1, 1, 4),
-		`SKY130_OPENRAM_RW_INITIATOR_PORT(sram_, 8, 32),
+		`GENERIC_SRAM_BYTE_EN_INITIATOR_PORT(sram_, 8, 32),
 		input			irq
 		);
 	
@@ -82,12 +82,12 @@ module clusterv_tile(
 		end
 	end
 	
-	assign sram_csb = ~(ic2sram_cyc && ic2sram_stb);
-	assign sram_web = ~ic2sram_we;
-	assign sram_wmask = ic2sram_sel; // TODO: pos or neg edge?
-	assign sram_addr = ic2sram_adr[9:2];
-	assign sram_dat_w = ic2sram_dat_w;
-	assign ic2sram_dat_r = sram_dat_r;
+	assign sram_read_en    = (ic2sram_cyc && ic2sram_stb && ~ic2sram_we);
+	assign sram_write_en   = (ic2sram_cyc && ic2sram_stb && ic2sram_we);
+	assign sram_byte_en    = ic2sram_sel; // TODO: pos or neg edge?
+	assign sram_addr       = ic2sram_adr[9:2];
+	assign sram_write_data = ic2sram_dat_w;
+	assign ic2sram_dat_r   = sram_read_data;
 	
 endmodule
 
