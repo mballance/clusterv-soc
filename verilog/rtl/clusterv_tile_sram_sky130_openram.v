@@ -25,7 +25,9 @@ module clusterv_tile_sram_sky130_openram(
 		`GENERIC_SRAM_BYTE_EN_TARGET_PORT(t_, 8, 32)
 		);
 	
-	sky130_sram_1kbyte_1rw1r_32x256_8 u_main_sram(
+	sky130_sram_1kbyte_1rw1r_32x256_8 #(
+			.VERBOSE(0)
+		) u_main_sram(
 			`ifdef USE_POWER_PINS
 				.vccd1(vccd1),
 				.vssd1(vssd1),
@@ -37,7 +39,7 @@ module clusterv_tile_sram_sky130_openram(
 			.wmask0(t_byte_en),
 			.addr0(t_addr),
 			.din0(t_write_data),
-			.dout0(tile2sram_dat_r[32*tile_i+:32]),
+			.dout0(t_read_data),
 			// Port 1: R
 			.clk1(1'b0),
 			.csb1(1'b1),

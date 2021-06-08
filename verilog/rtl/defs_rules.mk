@@ -13,9 +13,11 @@ MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/clusterv_storage.v
 MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/clusterv_tile.v
 MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/user_project_wrapper.v
 
-ifeq (openram,$(CLUSTERV_SOC_RAM))
+ifeq (openram,$(CLUSTERV_SOC_SRAM))
 MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/clusterv_tile_sram_sky130_openram.v
 MKDV_VL_DEFINES += CLUSTERV_TILE_SRAM_MODULE=clusterv_tile_sram_sky130_openram
+MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/clusterv_main_sram_sky130_openram.v
+MKDV_VL_DEFINES += CLUSTERV_MAIN_SRAM_MODULE=clusterv_main_sram_sky130_openram
 endif
 
 ifeq (,$(CLUSTERV_SOC_RAM))
@@ -34,9 +36,10 @@ include $(PACKAGES_DIR)/fwuart-16550/verilog/rtl/defs_rules.mk
 
 ifeq (icarus,$(MKDV_TOOL))
 MKDV_VL_SRCS += $(PACKAGES_DIR)/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v
+MKDV_VL_SRCS += $(PACKAGES_DIR)/sky130_sram_macros/sky130_sram_4kbyte_1rw1r_32x1024_8/sky130_sram_4kbyte_1rw1r_32x1024_8.v
 endif
 
-endif
+endif # endif protection
 
 else # Rules
 

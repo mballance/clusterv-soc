@@ -219,12 +219,12 @@ module clusterv_soc(
 		.flash_io1_do   (flash_io1_do  ), 
 		.flash_io2_do   (flash_io2_do  ), 
 		.flash_io3_do   (flash_io3_do  ), 
-		.flash_io0_di   (flash_io0_di  ), 
 		 */
-		.flash_io1_di   (flash_sdi     ) 
+		.flash_io0_di   (1'b0  ), 
+		.flash_io1_di   (flash_sdi     ),
+		.flash_io2_di   (1'b0  ), 
+		.flash_io3_di   (1'b0  )
 		/*
-		.flash_io2_di   (flash_io2_di  ), 
-		.flash_io3_di   (flash_io3_di  )
 		 */);
 	
 

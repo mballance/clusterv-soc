@@ -19,7 +19,7 @@ MEMORY {
 #ifdef BOOT_FLASH
 	// Boot from Flash and run from RAM
 	FLASH (rx)	: ORIGIN = 0x10000000, LENGTH = 0x400000 	/* 4MB */
-	RAM(xrw)	: ORIGIN = 0x80000000, LENGTH = 0x04000		/* 16KB */
+	RAM(xrw)	: ORIGIN = 0x80000060, LENGTH = 0x04000		/* 16KB */
 #define CODELOC >RAM AT>FLASH
 #else
 	RAM(xrw)	: ORIGIN = 0x80000000, LENGTH = 0x04000		/* 16KB */
