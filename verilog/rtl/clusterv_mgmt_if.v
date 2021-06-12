@@ -1,8 +1,10 @@
 /****************************************************************************
  * clusterv_mgmt_if.v
  ****************************************************************************/
+`ifndef INCLUDED_INTERFACE_MACROS
 `include "wishbone_macros.svh"
 `include "wishbone_tag_macros.svh"
+`endif
   
 /**
  * Module: clusterv_mgmt_if
@@ -12,13 +14,15 @@
 module clusterv_mgmt_if #(
 		parameter DEFAULT_RESET_VECTOR = 32'h10000000
 		) (
-		input			mgmt_clock,
-		input			mgmt_reset,
+		input				mgmt_clock,
+		input				mgmt_reset,
 		`WB_TARGET_PORT(mgmt_, 32, 32),
 		`WB_TAG_INITIATOR_PORT(sys_, 32, 32, 1, 1, 4),
-		output[31:0]	resvec,
-		output			sys_clock,
-		output			sys_reset
+		output[(4*32)-1:0]	resvec,
+		output[(4*32)-1:0]	hartid,
+		output				sys_clock,
+		output				sys_reset,
+		output				core_reset
 		);
 
 	`WB_WIRES(mgmt_regs_, 32, 32);
@@ -28,8 +32,8 @@ module clusterv_mgmt_if #(
 	assign mgmt_ic2bridge_tgd_w = 1'b0;
 
 	// TODO:
-	wire sys_clock = mgmt_clock;
-	wire sys_reset = mgmt_reset;
+	assign sys_clock = mgmt_clock;
+	assign sys_reset = mgmt_reset;
 	
 	wb_interconnect_1xN_pt #(
 		.ADR_WIDTH   (32  ), 
@@ -46,18 +50,34 @@ module clusterv_mgmt_if #(
 		.reset       (mgmt_reset      ), 
 		`WB_CONNECT(t_, mgmt_),
 		`WB_CONNECT(i_, mgmt_regs_),
-		`WB_CONNECT(pt_, mgmt_ic2bridge_));
+		`WB_CONNECT(pt_, sys_));
 	
 	reg[31:0]			resvec_r;
+	reg 				core_reset_r;
 	reg[7:0]			sysaddr_page;
+
+	// TODO: make truly programmable
+	assign resvec[31:0]   = resvec_r;
+	assign resvec[63:32]  = resvec_r;
+	assign resvec[95:64]  = resvec_r;
+	assign resvec[127:96] = resvec_r;
+	assign hartid[31:0]   = 0;
+	assign hartid[63:32]  = 1;
+	assign hartid[95:64]  = 2;
+	assign hartid[127:96] = 3;
+	assign core_reset = core_reset_r;
 	
-	assign resvec = resvec_r;
+	assign mgmt_regs_ack = (mgmt_regs_cyc && mgmt_regs_stb);
 	
 	always @(posedge mgmt_clock or posedge mgmt_reset) begin
 		if (mgmt_reset) begin
 			resvec_r <= DEFAULT_RESET_VECTOR;
-			sysaddr_page <= 8'h0;
+			sysaddr_page <= 8'h80;
+			core_reset_r <= 1'b1;
 		end else begin
+			if (mgmt_regs_cyc && mgmt_regs_stb) begin
+				resvec_r <= mgmt_regs_dat_w;
+			end
 		end
 	end
 	
@@ -70,18 +90,7 @@ module clusterv_mgmt_if #(
 		) u_mgmt2sys_bridge (
 		.reset      (mgmt_reset   ), 
 		.i_clock    (mgmt_clock   ), 
-		.i_adr      (mgmt_adr     ), 
-		.i_dat_w    (mgmt_dat_w   ), 
-		.i_dat_r    (mgmt_dat_r   ), 
-		.i_cyc      (mgmt_cyc     ), 
-		.i_err      (mgmt_err     ), 
-		.i_sel      (mgmt_sel     ), 
-		.i_stb      (mgmt_stb     ), 
-		.i_ack      (mgmt_ack     ), 
-		.i_we       (mgmt_we      ), 
-		.i_tgd_w    (1'b0         ), 
-		.i_tga      (1'b0         ), 
-		.i_tgc      (4'b0         ), 
+		`WB_TAG_CONNECT(i_, mgmt_ic2bridge_),
 		.t_clock    (sys_clock    ), 
 		`WB_TAG_CONNECT(t_, sys_  ));
 

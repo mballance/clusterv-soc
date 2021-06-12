@@ -1,8 +1,35 @@
 /****************************************************************************
  * clusterv_tile.v
  ****************************************************************************/
+`ifndef INTERFACE_MACROS_INCLUDED
 `include "wishbone_tag_macros.svh"
-`include "generic_sram_byte_en_macros.svh"
+`include "sky130_openram_macros.svh"
+`endif /* INTERFACE_MACROS_INCLUDED */
+
+/*
+`define WB_TAG_INITIATOR_PORT(PREFIX,ADDR_WIDTH,DATA_WIDTH,TGD_WIDTH,TGA_WIDTH,TGC_WIDTH) \
+output[ADDR_WIDTH-1:0]				PREFIX``adr, \
+output[DATA_WIDTH-1:0]				PREFIX``dat_w, \
+input[DATA_WIDTH-1:0]				PREFIX``dat_r, \
+output								PREFIX``cyc, \
+input								PREFIX``err, \
+output[DATA_WIDTH/8-1:0]			PREFIX``sel, \
+output								PREFIX``stb, \
+input								PREFIX``ack, \
+output								PREFIX``we, \
+output[TGD_WIDTH-1:0]				PREFIX``tgd_w, \
+input[TGD_WIDTH-1:0]				PREFIX``tgd_r, \
+output[TGA_WIDTH-1:0]				PREFIX``tga, \
+output[TGC_WIDTH-1:0]				PREFIX``tgc
+
+`define SKY130_OPENRAM_RW_INITIATOR_PORT(PREFIX, ADR_WIDTH, DAT_WIDTH) \
+output							PREFIX``csb, \
+output							PREFIX``web, \
+output[((DAT_WIDTH)/8)-1:0]		PREFIX``wmask, \
+output[ADR_WIDTH-1:0]			PREFIX``addr, \
+output[DAT_WIDTH-1:0]			PREFIX``dat_w, \
+input[DAT_WIDTH-1:0]			PREFIX``dat_r
+ */
 
 /**
  * Module: clusterv_tile
@@ -20,20 +47,44 @@ module clusterv_tile(
 		inout vssd1,	// User area 1 digital ground
 		inout vssd2,	// User area 2 digital ground
 `endif
-		
 		input			clock,
 		input			reset,
 		input[31:0]		hartid,
 		input[31:0]     resvec,
+		/*
+		output[31:0]	i_adr,
+		output[31:0]	i_dat_w,
+		input[31:0]		i_dat_r,
+		output			i_cyc,
+		input			i_err,
+		output[3:0]		i_sel,
+		output			i_stb,
+		input			i_ack,
+		output			i_we,
+		output[0:0]		i_tgd_w,
+		input[0:0]		i_tgd_r,
+		output[0:0]		i_tga,
+		output[3:0]		i_tgc,
+		
+		output			sram_csb,
+		output			sram_web,
+		output[3:0]		sram_wmask,
+		output[7:0]		sram_addr,
+		output[31:0]	sram_dat_w,
+		input[31:0]		sram_dat_r,
+		 */
 		`WB_TAG_INITIATOR_PORT(i_, 32, 32, 1, 1, 4),
-		`GENERIC_SRAM_BYTE_EN_INITIATOR_PORT(sram_, 8, 32),
+		`SKY130_OPENRAM_RW_INITIATOR_PORT(sram_, 8, 32),
 		input			irq
 		);
 	
 	`WB_TAG_WIRES(core2ic_, 32, 32, 1, 1, 4);
 	`WB_TAG_WIRES(ic2sram_, 32, 32, 1, 1, 4);
 	
-	fwrisc_rv32imca_wb u_core (
+	fwrisc_rv32imca_wb #(
+			.USE_FIXED_HARTID(0),
+			.USE_FIXED_RESVEC(0)
+		) u_core (
 		.clock     (clock    ), 
 		.reset     (reset    ), 
 		.hartid    (hartid   ),
@@ -82,12 +133,12 @@ module clusterv_tile(
 		end
 	end
 	
-	assign sram_read_en    = (ic2sram_cyc && ic2sram_stb && ~ic2sram_we);
-	assign sram_write_en   = (ic2sram_cyc && ic2sram_stb && ic2sram_we);
-	assign sram_byte_en    = ic2sram_sel; // TODO: pos or neg edge?
+	assign sram_csb        = ~(ic2sram_cyc && ic2sram_stb);
+	assign sram_web        = ~(ic2sram_cyc && ic2sram_stb && ic2sram_we);
+	assign sram_wmask      = ic2sram_sel; 
 	assign sram_addr       = ic2sram_adr[9:2];
-	assign sram_write_data = ic2sram_dat_w;
-	assign ic2sram_dat_r   = sram_read_data;
+	assign sram_dat_w      = ic2sram_dat_w;
+	assign ic2sram_dat_r   = sram_dat_r;
 	
 endmodule
 

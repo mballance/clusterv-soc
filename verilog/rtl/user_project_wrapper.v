@@ -29,9 +29,12 @@
  *-------------------------------------------------------------
  */
 
+`ifndef INCLUDED_INTERFACE_MACROS
 `include "verilog/rtl/defines.v"
 `include "wishbone_tag_macros.svh"
+`include "wishbone_macros.svh"
 `include "sky130_openram_macros.svh"
+`endif /* INCLUDED_INTERFACE_MACROS */
  
 `ifndef MPRJ_IO_PADS
 `define MPRJ_IO_PADS_1 19	/* number of user GPIO pads on user1 side */
@@ -87,27 +90,192 @@ module user_project_wrapper #(
     // User maskable interrupt signals
     output [2:0] user_irq
 );
-	
-	localparam N_TILES = 4;
-	
-	wire clock = wb_clk_i;
-	wire[N_TILES-1:0] irq = 0;
-	
-	wire sys_reset;
 	wire sys_clock;
-	wire reset = sys_reset;
-	wire[31:0]		resvec;
-
-	// TODO: want to control this?
-	assign user_irq = {3{1'b0}};
+	wire sys_reset;
+	wire core_reset;
+	wire[(32*4)-1:0]		hartid;
+	wire[(32*4)-1:0]		resvec;
 	
-	`SKY130_OPENRAM_RW_WIRES_ARR(tile2sram_, 8, 32, 4);
-	`WB_TAG_WIRES_ARR(tile2ic_, 32, 32, 1, 1, 4, 4);
+	/****************************************************************
+	 * Sys Interconnect
+	 ****************************************************************/
+	localparam INIT_IDX_TILE0 = 0;
+	localparam INIT_IDX_TILE1 = (INIT_IDX_TILE0+1);
+	localparam INIT_IDX_TILE2 = (INIT_IDX_TILE1+1);
+	localparam INIT_IDX_TILE3 = (INIT_IDX_TILE2+1);
+	localparam INIT_IDX_DMA   = (INIT_IDX_TILE3+1);
+	localparam INIT_IDX_MGMT  = (INIT_IDX_DMA+1);
+	localparam NUM_INIT = (INIT_IDX_MGMT+1);
+	localparam TARG_IDX_2K     = 0;
+	localparam TARG_IDX_4K     = (TARG_IDX_2K+1);
+	localparam TARG_IDX_8K     = (TARG_IDX_4K+1);
+	localparam TARG_IDX_PERIPH = (TARG_IDX_8K+1);
+	localparam NUM_TARG = (TARG_IDX_PERIPH+1);
+	`WB_TAG_WIRES_ARR(i2ic_, 32, 32, 1, 1, 4, NUM_INIT);
+	`WB_TAG_WIRES_ARR(ic2t_, 32, 32, 1, 1, 4, NUM_TARG);
+	
+	clusterv_sys_ic u_sys_ic (
+`ifdef USE_POWER_PINS
+		.vdda1(vdda1),	// User area 1 3.3V supply
+		.vdda2(vdda2),	// User area 2 3.3V supply
+		.vssa1(vssa1),	// User area 1 analog ground
+		.vssa2(vssa2),	// User area 2 analog ground
+		.vccd1(vccd1),	// User area 1 1.8V supply
+		.vccd2(vccd2),	// User area 2 1.8v supply
+		.vssd1(vssd1),	// User area 1 digital ground
+		.vssd2(vssd2),	// User area 2 digital ground
+`endif						
+		.clock    (sys_clock   ), 
+		.reset    (sys_reset   ), 
+		`WB_TAG_CONNECT(t_, i2ic_),
+		`WB_TAG_CONNECT(i_, ic2t_));
+	
+	/****************************************************************
+	 * TODO: 8k memories
+	 ****************************************************************/
+	`SKY130_OPENRAM_RW_WIRES_ARR(sram8k_, 11, 32, 4);
+	clusterv_mem_ctrl_8k u_memc_8k (
+`ifdef USE_POWER_PINS
+		.vdda1(vdda1),	// User area 1 3.3V supply
+		.vdda2(vdda2),	// User area 2 3.3V supply
+		.vssa1(vssa1),	// User area 1 analog ground
+		.vssa2(vssa2),	// User area 2 analog ground
+		.vccd1(vccd1),	// User area 1 1.8V supply
+		.vccd2(vccd2),	// User area 2 1.8v supply
+		.vssd1(vssd1),	// User area 1 digital ground
+		.vssd2(vssd2),	// User area 2 digital ground
+`endif						
+		.clock        (sys_clock       ), 
+		.reset        (sys_reset       ), 
+		`WB_TAG_CONNECT_ARR(t_, ic2t_, TARG_IDX_8K, 32, 32, 1, 1, 4),
+		`SKY130_OPENRAM_RW_CONNECT_ARR(sram0_, sram8k_, 0, 11, 32));
+	
+	generate
+		genvar sram8k_i;
+		for (sram8k_i=0; sram8k_i<4; sram8k_i=sram8k_i+1) begin : sram8k
+		end
+	endgenerate
+	
+	/****************************************************************
+	 * TODO: 4k memories
+	 ****************************************************************/
+	`SKY130_OPENRAM_RW_WIRES_ARR(sram4k_, 10, 32, 4);
+	clusterv_mem_ctrl_4k u_memc_4k (
+			`ifdef USE_POWER_PINS
+				.vdda1(vdda1),	// User area 1 3.3V supply
+				.vdda2(vdda2),	// User area 2 3.3V supply
+				.vssa1(vssa1),	// User area 1 analog ground
+				.vssa2(vssa2),	// User area 2 analog ground
+				.vccd1(vccd1),	// User area 1 1.8V supply
+				.vccd2(vccd2),	// User area 2 1.8v supply
+				.vssd1(vssd1),	// User area 1 digital ground
+				.vssd2(vssd2),	// User area 2 digital ground
+			`endif						
+			.clock        (sys_clock       ), 
+			.reset        (sys_reset       ), 
+			`WB_TAG_CONNECT_ARR(t_, ic2t_, TARG_IDX_4K, 32, 32, 1, 1, 4),
+			`SKY130_OPENRAM_RW_CONNECT_ARR(sram0_, sram4k_, 0, 10, 32));
+	
+	generate
+		genvar sram4k_i;
+		for (sram4k_i=0; sram4k_i<4; sram4k_i=sram4k_i+1) begin : sram4k
+		end
+	endgenerate	
+	
+	/****************************************************************
+	 * TODO: 2k memories
+	 ****************************************************************/
+	`SKY130_OPENRAM_RW_WIRES_ARR(sram2k_, 9, 32, 4);
+	clusterv_mem_ctrl_2k u_memc_2k (
+			`ifdef USE_POWER_PINS
+				.vdda1(vdda1),	// User area 1 3.3V supply
+				.vdda2(vdda2),	// User area 2 3.3V supply
+				.vssa1(vssa1),	// User area 1 analog ground
+				.vssa2(vssa2),	// User area 2 analog ground
+				.vccd1(vccd1),	// User area 1 1.8V supply
+				.vccd2(vccd2),	// User area 2 1.8v supply
+				.vssd1(vssd1),	// User area 1 digital ground
+				.vssd2(vssd2),	// User area 2 digital ground
+			`endif						
+			.clock        (sys_clock       ), 
+			.reset        (sys_reset       ), 
+			`WB_TAG_CONNECT_ARR(t_, ic2t_, TARG_IDX_2K, 32, 32, 1, 1, 4),
+			// Connect the common interface
+			`SKY130_OPENRAM_RW_CONNECT_ARR(sram0_, sram2k_, 0, 10, 32),
+			.sram1_csb(sram2k_csb[1]),
+			.sram1_dat_r(sram2k_dat_r[(32*1)+:32]),
+			.sram2_csb(sram2k_csb[2]),
+			.sram2_dat_r(sram2k_dat_r[(32*2)+:32]),
+			.sram3_csb(sram2k_csb[3]),
+			.sram3_dat_r(sram2k_dat_r[(32*3)+:32])
+			);
+	
+	generate
+		genvar sram2k_i;
+		for (sram2k_i=0; sram2k_i<4; sram2k_i=sram2k_i+1) begin : sram2k
+			sky130_sram_2kbyte_1rw1r_32x512_8 u_sram(
+					`ifdef USE_POWER_PINS
+						.vccd1(vccd1),
+						.vssd1(vssd1),
+					`endif
+					// Port 0: RW
+					.clk0(sys_clock),
+					.csb0(sram2k_csb[sram2k_i]),
+					.web0(sram2k_web[0]),
+					.wmask0(sram2k_wmask[3:0]),
+					.addr0(sram2k_addr[31:0]),
+					.din0(sram2k_dat_w[31:0]),
+					.dout0(sram2k_dat_r[(32*sram2k_i)+:32])
+					/*,
+					// Port 1: R
+					.clk1(1'b0),
+					.csb1(1'b1),
+					.addr1(8'h0) 
+					 */
+				);								
+		end
+	endgenerate		
+	
+	/****************************************************************
+	 * Management interface
+	 ****************************************************************/
+	clusterv_mgmt_if u_mgmt_if (
+`ifdef USE_POWER_PINS
+		.vdda1(vdda1),	// User area 1 3.3V supply
+		.vdda2(vdda2),	// User area 2 3.3V supply
+		.vssa1(vssa1),	// User area 1 analog ground
+		.vssa2(vssa2),	// User area 2 analog ground
+		.vccd1(vccd1),	// User area 1 1.8V supply
+		.vccd2(vccd2),	// User area 2 1.8v supply
+		.vssd1(vssd1),	// User area 1 digital ground
+		.vssd2(vssd2),	// User area 2 digital ground
+`endif						
+		.mgmt_clock            (wb_clk_i              ), 
+		.mgmt_reset            (wb_rst_i              ), 
+		.mgmt_adr              (wbs_adr_i             ), 
+		.mgmt_dat_w            (wbs_dat_i             ), 
+		.mgmt_dat_r            (wbs_dat_o             ), 
+		.mgmt_cyc              (wbs_cyc_i             ), 
+//		.mgmt_err              (mgmt_err             ), 
+		.mgmt_sel              (wbs_sel_i             ), 
+		.mgmt_stb              (wbs_stb_i             ), 
+		.mgmt_ack              (wbs_ack_o             ), 
+		.mgmt_we               (wbs_we_i              ),
+		`WB_TAG_CONNECT_ARR(sys_, i2ic_, INIT_IDX_MGMT, 32, 32, 1, 1, 4),
+		.resvec                (resvec               ), 
+		.hartid                (hartid               ), 
+		.sys_clock             (sys_clock            ), 
+		.sys_reset             (sys_reset            ), 
+		.core_reset            (core_reset           ));
 
+	/****************************************************************
+	 * Core Tiles
+	 ****************************************************************/
+	`SKY130_OPENRAM_RW_WIRES_ARR(tile2sram_, 8, 32, 4);
+	wire[3:0]					tile_irq;
 	generate
 		genvar tile_i;
-		for (tile_i=0; tile_i<N_TILES; tile_i=tile_i+1) begin : tile
-			wire[31:0] hartid = tile_i;
+		for (tile_i=0; tile_i<4; tile_i=tile_i+1) begin : tiles
 			clusterv_tile u_tile (
 `ifdef USE_POWER_PINS
 				.vdda1(vdda1),	// User area 1 3.3V supply
@@ -118,107 +286,61 @@ module user_project_wrapper #(
 				.vccd2(vccd2),	// User area 2 1.8v supply
 				.vssd1(vssd1),	// User area 1 digital ground
 				.vssd2(vssd2),	// User area 2 digital ground
-`endif			
-				.clock       (clock         ), 
-				.reset       (reset         ), 
-				.hartid      (hartid        ), 
-				.resvec      (resvec        ), 
-				`WB_TAG_CONNECT_ARR(i_, tile2ic_, tile_i, 32, 32, 1, 1, 4),
+`endif						
+				.clock       (sys_clock                  ), 
+				.reset       (core_reset                 ), 
+				.hartid      (hartid[32*tile_i+:32]      ), 
+				.resvec      (resvec[32*tile_i+:32]     ), 
+				`WB_TAG_CONNECT_ARR(i_, i2ic_, INIT_IDX_TILE0+tile_i, 32, 32, 1, 1, 4),
 				`SKY130_OPENRAM_RW_CONNECT_ARR(sram_, tile2sram_, tile_i, 8, 32),
-				.irq         (irq[tile_i]   ));
-
-//	assign io_out = tile0ic_adr;
-//	assign tile0ic_dat_r = io_in;
-	
-			sky130_sram_1kbyte_1rw1r_32x256_8 u_tile0_sram(
+				.irq         (tile_irq[tile_i]));
+			
+			sky130_sram_1kbyte_1rw1r_32x256_8 u_tile_sram(
 `ifdef USE_POWER_PINS
-				.vccd1(vccd1),
-				.vssd1(vssd1),
+					.vccd1(vccd1),
+					.vssd1(vssd1),
 `endif
-				// Port 0: RW
-				.clk0(clock),
-				.csb0(tile2sram_csb[tile_i]),
-				.web0(tile2sram_web[tile_i]),
-				.wmask0(tile2sram_wmask[4*tile_i+:4]),
-				.addr0(tile2sram_addr[8*tile_i+:8]),
-				.din0(tile2sram_dat_w[32*tile_i+:32]),
-				.dout0(tile2sram_dat_r[32*tile_i+:32]),
-				// Port 1: R
-				.clk1(1'b0),
-				.csb1(1'b1),
-				.addr1(8'h0)
-				);
+					// Port 0: RW
+					.clk0(sys_clock),
+					.csb0(tile2sram_csb[tile_i]),
+					.web0(tile2sram_web[tile_i]),
+					.wmask0(tile2sram_wmask[4*tile_i+:4]),
+					.addr0(tile2sram_addr[8*tile_i+:8]),
+					.din0(tile2sram_dat_w[32*tile_i+:32]),
+					.dout0(tile2sram_dat_r[32*tile_i+:32])
+					/*,
+					// Port 1: R
+					.clk1(1'b0),
+					.csb1(1'b1),
+					.addr1(8'h0) 
+					*/
+			);					
 		end
 	endgenerate
 	
-	`WB_TAG_WIRES(mgmt_sys_i_, 32, 32, 1, 1, 4);
-
-`ifdef UNDEFINED	
-	clusterv_periph_subsys u_periph_subsys (
-		.mgmt_clock        (wb_clk_i       ), 
-		.mgmt_reset        (wb_rst_i       ), 
-		.mgmt_t_adr        (wbs_adr_i       ), 
-		.mgmt_t_dat_w      (wbs_dat_i     ), 
-		.mgmt_t_dat_r      (wbs_dat_o     ), 
-		.mgmt_t_cyc        (wbs_cyc_i       ), 
-//		.mgmt_t_err        (wbs_e       ), 
-		.mgmt_t_sel        (wbs_sel_i       ), 
-		.mgmt_t_stb        (wbs_stb_i       ), 
-		.mgmt_t_ack        (wbs_ack_o       ), 
-		.mgmt_t_we         (wbs_we_i        ), 
-		.sys_clock         (sys_clock        ), 
-		.sys_reset         (sys_reset        ), 
-		`WB_TAG_CONNECT(mgmt_sys_i_, mgmt_sys_i_),
-		.resvec            (resvec           ));
+	clusterv_periph_subsys clusterv_periph_subsys (
+`ifdef USE_POWER_PINS
+		.vdda1(vdda1),	// User area 1 3.3V supply
+		.vdda2(vdda2),	// User area 2 3.3V supply
+		.vssa1(vssa1),	// User area 1 analog ground
+		.vssa2(vssa2),	// User area 2 analog ground
+		.vccd1(vccd1),	// User area 1 1.8V supply
+		.vccd2(vccd2),	// User area 2 1.8v supply
+		.vssd1(vssd1),	// User area 1 digital ground
+		.vssd2(vssd2),	// User area 2 digital ground
+`endif						
+		.clock       (sys_clock      ), 
+		.reset       (sys_reset      ), 
+		`WB_TAG_CONNECT_ARR(regs_, ic2t_, TARG_IDX_PERIPH, 32, 32, 1, 1, 4),
+		`WB_TAG_CONNECT_ARR(dma_,  i2ic_, INIT_IDX_DMA, 32, 32, 1, 1, 4),
+		.core_irq    (tile_irq       ) /*, 
+		.spi0_sck    (spi0_sck   ), 
+		.spi0_sdo    (spi0_sdo   ), 
+		.spi0_sdi    (spi0_sdi   ), 
+		.spi1_sck    (spi1_sck   ), 
+		.spi1_sdo    (spi1_sdo   ), 
+		.spi1_sdi    (spi1_sdi   ), 
+		.uart_tx     (uart_tx    ), 
+		.uart_rx     (uart_rx    ) */);
 	
-	fwspi_memio_wb u_spi_memio (
-		.clock          (sys_clock     ), 
-		.reset          (reset         ), 
-		.cfg_adr        (cfg_adr       ), 
-		.cfg_dat_w      (cfg_dat_w     ), 
-		.cfg_dat_r      (cfg_dat_r     ), 
-		.cfg_cyc        (cfg_cyc       ), 
-		.cfg_err        (cfg_err       ), 
-		.cfg_sel        (cfg_sel       ), 
-		.cfg_stb        (cfg_stb       ), 
-		.cfg_ack        (cfg_ack       ), 
-		.cfg_we         (cfg_we        ), 
-		.flash_adr      (flash_adr     ), 
-		.flash_dat_w    (flash_dat_w   ), 
-		.flash_dat_r    (flash_dat_r   ), 
-		.flash_cyc      (flash_cyc     ), 
-		.flash_err      (flash_err     ), 
-		.flash_sel      (flash_sel     ), 
-		.flash_stb      (flash_stb     ), 
-		.flash_ack      (flash_ack     ), 
-		.flash_we       (flash_we      ), 
-		.quad_mode      (quad_mode     ), 
-		.flash_csb      (flash_csb     ), 
-		.flash_clk      (flash_clk     ), 
-		.flash_csb_oeb  (flash_csb_oeb ), 
-		.flash_clk_oeb  (flash_clk_oeb ), 
-		.flash_io0_oeb  (flash_io0_oeb ), 
-		.flash_io1_oeb  (flash_io1_oeb ), 
-		.flash_io2_oeb  (flash_io2_oeb ), 
-		.flash_io3_oeb  (flash_io3_oeb ), 
-		.flash_csb_ieb  (flash_csb_ieb ), 
-		.flash_clk_ieb  (flash_clk_ieb ), 
-		.flash_io0_ieb  (flash_io0_ieb ), 
-		.flash_io1_ieb  (flash_io1_ieb ), 
-		.flash_io2_ieb  (flash_io2_ieb ), 
-		.flash_io3_ieb  (flash_io3_ieb ), 
-		.flash_io0_do   (flash_io0_do  ), 
-		.flash_io1_do   (flash_io1_do  ), 
-		.flash_io2_do   (flash_io2_do  ), 
-		.flash_io3_do   (flash_io3_do  ), 
-		.flash_io0_di   (flash_io0_di  ), 
-		.flash_io1_di   (flash_io1_di  ), 
-		.flash_io2_di   (flash_io2_di  ), 
-		.flash_io3_di   (flash_io3_di  ));
-`endif /* UNDEFINED */
-	
-	
-// Dummy assignment so that we can take it through the openlane flow
-// assign io_out = io_in;
-
 endmodule	// user_project_wrapper

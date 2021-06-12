@@ -1,0 +1,63 @@
+mkdir -p /project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/cache/icarus
+make -C /project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/cache/icarus -f /project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/mkdv.mk \
+	MKDV_RUNDIR=/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir \
+	MKDV_CACHEDIR=/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/cache/icarus \
+	build-icarus || (echo "FAIL: exit status $?" > status.txt; exit 1)
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/cache/icarus'
+make[1]: Nothing to be done for 'build-icarus'.
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/cache/icarus'
+INCFILES: /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_ncsim.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_icestorm.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_vcs.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_icarus.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_cocotb.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_vlsim.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_openlane.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_questa.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_quartus.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_sby.mk /project/fun/openlane/clusterv-soc/packages/mkdv/src/mkdv/share/mkfiles/mkdv_pybfms.mk sby questa icestorm vlsim quartus openlane icarus questa icestorm quartus openlane cocotb pybfms
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+Pre-Run:  
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+make BOOT=flash -f /project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper//tests/baremetal/baremetal.mk baremetal/smoke.elf
+make[2]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+riscv64-zephyr-elf-gcc -x c -march=rv32i -DBOOT_FLASH -E /project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/tests/baremetal//baremetal.ld.pp -o - | grep -v '^#' > baremetal.ld
+riscv64-zephyr-elf-gcc -march=rv32i -DBOOT_FLASH   -c -o smoke.o /project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/tests/baremetal/smoke.c
+riscv64-zephyr-elf-gcc -DBOOT_FLASH   -c -o crt0.o /project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/tests/baremetal/crt0.S
+mkdir -p `dirname baremetal/smoke.elf`
+riscv64-zephyr-elf-gcc -o baremetal/smoke.elf -march=rv32i -DBOOT_FLASH smoke.o crt0.o \
+	-static -mcmodel=medany -nostartfiles \
+	-Tbaremetal.ld
+rm smoke.o crt0.o
+make[2]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+     -.--ns INFO     cocotb.gpi                         ..mbed/gpi_embed.cpp:77   in set_program_name_in_venv        Did not detect Python virtual environment. Using system-wide Python interpreter
+     -.--ns INFO     cocotb.gpi                         ../gpi/GpiCommon.cpp:105  in gpi_print_registered_impl       VPI registered
+     -.--ns INFO     cocotb.gpi                         ..mbed/gpi_embed.cpp:240  in _embed_sim_init                 Python interpreter initialized and cocotb loaded!
+     0.00ns INFO     Running on Icarus Verilog version 11.0 (stable)
+     0.00ns INFO     Running tests with cocotb v1.5.2 from /project/fun/openlane/clusterv-soc/packages/python/lib64/python3.6/site-packages/cocotb
+     0.00ns INFO     Seeding Python random module with 1623251468
+     0.00ns WARNING  Pytest not found, assertion rewriting will not occur
+     0.00ns INFO     Found test user_project_wrapper_tests.user_project_wrapper_test_base.entry
+     0.00ns INFO     Running test 1/1: entry
+     0.00ns INFO     Starting test: "entry"
+                     Description: None
+/project/fun/openlane/clusterv-soc/packages/pybfms/src/pybfms/backend.py:50: RuntimeWarning: Timer setup with value 0, which might exhibit undefined behavior in some simulators
+  return Timer(time_ps, units)
+BFM: user_project_wrapper_tb.u_pin_gpio : gpio_bfms.GpioBfm.GpioBfm
+BFM: user_project_wrapper_tb.u_mgmt_bfm : wishbone_bfms.wb_initiator_bfm.WbInitiatorBfm
+BFM: user_project_wrapper_tb.u_dut.u_soc.tile[0].u_tile.u_core.fwrisc.u_tracer.u_dbg.u_dbg : riscv_debug_bfms.riscv_debug_bfm.RiscvDebugBfm
+ 15930.00ns INFO     Test Passed: entry
+ 15930.00ns INFO     Passed 1 tests (0 skipped)
+ 15930.00ns INFO     *************************************************************************************************************************
+                     ** TEST                                                             PASS/FAIL  SIM TIME(NS)  REAL TIME(S)  RATIO(NS/S) **
+                     *************************************************************************************************************************
+                     ** user_project_wrapper_tests.user_project_wrapper_test_base.entry    PASS        15930.00          0.26     60804.61  **
+                     *************************************************************************************************************************
+                     
+ 15930.00ns INFO     *************************************************************************************
+                     **                                 ERRORS : 0                                      **
+                     *************************************************************************************
+                     **                               SIM TIME : 15930.00 NS                            **
+                     **                              REAL TIME : 0.27 S                                 **
+                     **                        SIM / REAL TIME : 59424.89 NS/S                          **
+                     *************************************************************************************
+                     
+ 15930.00ns INFO     Shutting down...
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+Post-Run: 
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+make[1]: Entering directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'
+make[1]: Leaving directory '/project/fun/openlane/clusterv-soc/verilog/dv/user_project_wrapper/rundir'

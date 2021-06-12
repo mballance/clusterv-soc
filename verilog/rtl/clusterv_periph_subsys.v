@@ -1,8 +1,10 @@
 /****************************************************************************
  * clusterv_periph_subsys.v
  ****************************************************************************/
+`ifndef INCLUDED_INTERFACE_MACROS
 `include "wishbone_macros.svh"
 `include "wishbone_tag_macros.svh"
+`endif /* INCLUDED_INTERFACE_MACROS */
   
 /**
  * Module: clusterv_periph_subsys
@@ -22,8 +24,9 @@ module clusterv_periph_subsys(
 `endif
 		input		clock,
 		input		reset,
-		`WB_TARGET_PORT(regs_, 16, 32),
-		`WB_INITIATOR_PORT(dma_, 32, 32),
+		`WB_TAG_TARGET_PORT(regs_, 16, 32, 1, 1, 4),
+		`WB_TAG_INITIATOR_PORT(dma_, 32, 32, 1, 1, 4),
+		output[3:0]	core_irq,
 		output		spi0_sck,
 		output		spi0_sdo,
 		input		spi0_sdi,
@@ -34,7 +37,12 @@ module clusterv_periph_subsys(
 		input		uart_rx
 		);
 
-	localparam TARGET_IDX_SPI0 = 0;
+	localparam TARGET_IDX_LOCAL_INTC0 = 0;
+	localparam TARGET_IDX_LOCAL_INTC1 = (TARGET_IDX_LOCAL_INTC0+1);
+	localparam TARGET_IDX_LOCAL_INTC2 = (TARGET_IDX_LOCAL_INTC1+1);
+	localparam TARGET_IDX_LOCAL_INTC3 = (TARGET_IDX_LOCAL_INTC2+1);
+	localparam TARGET_IDX_PIC         = (TARGET_IDX_LOCAL_INTC3+1);
+	localparam TARGET_IDX_SPI0 = (TARGET_IDX_PIC+1);
 	localparam TARGET_IDX_SPI1 = (TARGET_IDX_SPI0+1);
 	localparam TARGET_IDX_UART = (TARGET_IDX_SPI1+1);
 	localparam TARGET_IDX_DMA  = (TARGET_IDX_UART+1);
@@ -62,15 +70,25 @@ module clusterv_periph_subsys(
 		.DAT_WIDTH   (32  ), 
 		.N_TARGETS   (N_TARGETS  ), 
 		.T_ADR_MASK  ({
+				16'hFF00,		// LINTC0
+				16'hFF00,		// LINTC1
+				16'hFF00,		// LINTC2
+				16'hFF00,		// LINTC3
+				16'hFF00,		// PIC
 				16'hFF00,		// SPI0
 				16'hFF00,		// SPI1
 				16'hFF00,		// UART
 				16'hF000        // DMA
 			}), 
 		.T_ADR       ({
-				16'h0100,		// SPI0
-				16'h0200,		// SPI1
-				16'h0300,		// UART
+				16'h0000,		// LINTC0
+				16'h0100,		// LINTC1
+				16'h0200,		// LINTC2
+				16'h0300,		// LINTC3
+				16'h0400,		// PIC
+				16'h0500,		// SPI0
+				16'h0600,		// SPI1
+				16'h0700,		// UART
 				16'h1000		// DMA
 			})
 		) u_periph_ic (
@@ -80,6 +98,31 @@ module clusterv_periph_subsys(
 		`WB_CONNECT(i_, ic2periph_),
 		`WB_CONNECT(pt_, error_t_));
 
+	wire global_irq;
+	generate
+		genvar local_intc_i;
+		for (local_intc_i=0; local_intc_i<4; local_intc_i=local_intc_i+1) begin : local_intc
+			fw_local_intc_wb #(
+				.N_SRCS   (1   ), 
+				.EN_MASK  ('b1 )
+			) u_local_intc (
+				.clock    (clock   ), 
+				.reset    (reset   ), 
+				`WB_CONNECT_ARR(r_, ic2periph_, TARGET_IDX_LOCAL_INTC0+local_intc_i, 16, 32),
+				.src      (global_irq            ), 
+				.irq      (core_irq[local_intc_i]));
+		end
+	endgenerate
+
+	fwpic_wb #(
+		.N_IRQ     (N_IRQ    )
+		) u_pic (
+		.clock     (clock       ), 
+		.reset     (reset       ), 
+		`WB_CONNECT_ARR(rt_, ic2periph_, TARGET_IDX_PIC, 16, 32),
+		.int_o     (global_irq  ), 
+		.irq       (periph_irq  ));
+	
 	// Ensure out-of-bounds accesses don't stall
 	assign error_t_ack = (error_t_cyc && error_t_stb);
 	assign error_t_err = (error_t_cyc && error_t_stb);

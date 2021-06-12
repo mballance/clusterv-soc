@@ -1,0 +1,78 @@
+#****************************************************************************
+# ivpm.yaml
+# IVPM meta-data file for project clusterv-soc
+#
+#****************************************************************************
+
+package:
+    name: clusterv-soc
+    version: 0.0.1
+
+    deps:
+        - name: fwprotocol-defs
+          url: https://github.com/Featherweight-IP/fwprotocol-defs.git
+        - name: fw-local-intc
+          url: https://github.com/Featherweight-IP/fw-local-intc.git
+        - name: fwperiph-dma
+          url: https://github.com/Featherweight-IP/fwperiph-dma.git
+        - name: fw-wishbone-bridges
+          url: https://github.com/Featherweight-IP/fw-wishbone-bridges.git
+        - name: fw-wishbone-interconnect
+          url: https://github.com/Featherweight-IP/fw-wishbone-interconnect.git
+        - name: fw-wishbone-sram-ctrl
+          url: https://github.com/Featherweight-IP/fw-wishbone-sram-ctrl.git
+        - name: fwgpio
+          url: https://github.com/Featherweight-IP/fwgpio.git
+        - name: fwrisc
+          url: https://github.com/Featherweight-IP/fwrisc.git
+        - name: fwspi-initiator
+          url: https://github.com/Featherweight-IP/fwspi-initiator.git
+        - name: fwspi-memio
+          url: https://github.com/Featherweight-IP/fwspi-memio.git
+        - name: fwuart-1655
+          url: https://github.com/Featherweight-IP/fwuart-16550.git
+        - name: sky130_sram_macros
+          url: https://github.com/efabless/sky130_sram_macros.git
+          
+    dev-deps:
+        - name: pyelftools
+          type: python
+        - name: pyyaml
+          type: python
+        - name: cocotb
+          type: python
+        - name: vlsim
+          type: python
+        - name: pyhvl-rpc
+          type: python
+          url: https://github.com/fvutils/pyhvl-rpc.git
+          
+        - name: pybfms
+          url: https://github.com/pybfms/pybfms.git
+          type: python
+        - name: pybfms-generic-sram
+          type: python
+          url: https://github.com/pybfms/pybfms-generic-sram.git
+        - name: pybfms-gpio
+          type: python
+          url: https://github.com/pybfms/pybfms-gpio.git
+        - name: pybfms_mem_core
+          type: python
+          url: https://github.com/pybfms/pybfms_mem_core.git
+        - name: pybfms-core-debug-common
+          type: python
+          url: https://github.com/pybfms/pybfms-core-debug-common.git
+        - name: pybfms-risc-debug
+          type: python
+          url: https://github.com/pybfms/pybfms_riscv_debug.git
+        - name: pybfms-spi
+          type: python
+          url:  https://github.com/pybfms/pybfms-spi.git
+        - name: pybfms-wishbone
+          type: python
+          url:  https://github.com/pybfms/pybfms-wishbone.git
+          
+        - name: mkdv
+          type: python
+          url: https://github.com/fvutils/mkdv.git
+          
