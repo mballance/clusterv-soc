@@ -29,7 +29,7 @@ package:
           url: https://github.com/Featherweight-IP/fwspi-initiator.git
         - name: fwspi-memio
           url: https://github.com/Featherweight-IP/fwspi-memio.git
-        - name: fwuart-1655
+        - name: fwuart-16550
           url: https://github.com/Featherweight-IP/fwuart-16550.git
         - name: sky130_sram_macros
           url: https://github.com/efabless/sky130_sram_macros.git
@@ -37,12 +37,16 @@ package:
     dev-deps:
         - name: pyelftools
           type: python
+          src: pypi
         - name: pyyaml
           type: python
+          src: pypi
         - name: cocotb
           type: python
+          src: pypi
         - name: vlsim
           type: python
+          src: pypi
         - name: pyhvl-rpc
           type: python
           url: https://github.com/fvutils/pyhvl-rpc.git
@@ -62,7 +66,7 @@ package:
         - name: pybfms-core-debug-common
           type: python
           url: https://github.com/pybfms/pybfms-core-debug-common.git
-        - name: pybfms-risc-debug
+        - name: pybfms-riscv-debug
           type: python
           url: https://github.com/pybfms/pybfms_riscv_debug.git
         - name: pybfms-spi
@@ -75,4 +79,34 @@ package:
         - name: mkdv
           type: python
           url: https://github.com/fvutils/mkdv.git
+
+        - name: fwprotocol-defs
+          url: https://github.com/Featherweight-IP/fwprotocol-defs.git
+        - name: fw-local-intc
+          url: https://github.com/Featherweight-IP/fw-local-intc.git
+        - name: fwperiph-dma
+          url: https://github.com/Featherweight-IP/fwperiph-dma.git
+        - name: fw-wishbone-bridges
+          url: https://github.com/Featherweight-IP/fw-wishbone-bridges.git
+        - name: fw-wishbone-interconnect
+          url: https://github.com/Featherweight-IP/fw-wishbone-interconnect.git
+        - name: fw-wishbone-sram-ctrl
+          url: https://github.com/Featherweight-IP/fw-wishbone-sram-ctrl.git
+        - name: fwgpio
+          url: https://github.com/Featherweight-IP/fwgpio.git
+        - name: fwpit
+          url: https://github.com/Featherweight-IP/fwpit.git
+        - name: fwpic
+          url: https://github.com/Featherweight-IP/fwpic.git
+        - name: fwrisc
+          url: https://github.com/Featherweight-IP/fwrisc.git
+          branch: reorg-mkdv
+        - name: fwspi-initiator
+          url: https://github.com/Featherweight-IP/fwspi-initiator.git
+        - name: fwspi-memio
+          url: https://github.com/Featherweight-IP/fwspi-memio.git
+        - name: fwuart-16550
+          url: https://github.com/Featherweight-IP/fwuart-16550.git
+        - name: sky130_sram_macros
+          url: https://github.com/efabless/sky130_sram_macros.git
           
