@@ -21,7 +21,10 @@ class UserProjectWrapperTestBase(object):
     
     async def run(self):
         for i in range(10):
-            await self.mgmt_bfm.write(0x10000000+4*i, 0xffeeaa55, 0xF)
+            await self.mgmt_bfm.write(0x12000000+4*i, 0x55+i, 0xF)
+        for i in range(10):
+            data = await self.mgmt_bfm.read(0x12000000+4*i)
+            print("data: 0x%08x" % data)
         pass
     
 @cocotb.test()

@@ -6,37 +6,15 @@
 `include "sky130_openram_macros.svh"
 `endif /* INTERFACE_MACROS_INCLUDED */
 
-/*
-`define WB_TAG_INITIATOR_PORT(PREFIX,ADDR_WIDTH,DATA_WIDTH,TGD_WIDTH,TGA_WIDTH,TGC_WIDTH) \
-output[ADDR_WIDTH-1:0]				PREFIX``adr, \
-output[DATA_WIDTH-1:0]				PREFIX``dat_w, \
-input[DATA_WIDTH-1:0]				PREFIX``dat_r, \
-output								PREFIX``cyc, \
-input								PREFIX``err, \
-output[DATA_WIDTH/8-1:0]			PREFIX``sel, \
-output								PREFIX``stb, \
-input								PREFIX``ack, \
-output								PREFIX``we, \
-output[TGD_WIDTH-1:0]				PREFIX``tgd_w, \
-input[TGD_WIDTH-1:0]				PREFIX``tgd_r, \
-output[TGA_WIDTH-1:0]				PREFIX``tga, \
-output[TGC_WIDTH-1:0]				PREFIX``tgc
-
-`define SKY130_OPENRAM_RW_INITIATOR_PORT(PREFIX, ADR_WIDTH, DAT_WIDTH) \
-output							PREFIX``csb, \
-output							PREFIX``web, \
-output[((DAT_WIDTH)/8)-1:0]		PREFIX``wmask, \
-output[ADR_WIDTH-1:0]			PREFIX``addr, \
-output[DAT_WIDTH-1:0]			PREFIX``dat_w, \
-input[DAT_WIDTH-1:0]			PREFIX``dat_r
- */
-
 /**
  * Module: clusterv_tile
  * 
  * TODO: Add module documentation
  */
-module clusterv_tile(
+module clusterv_tile #(
+		parameter HARTID=32'h8000_0000
+		) (
+`ifdef UNDEFINED
 `ifdef USE_POWER_PINS
 		inout vdda1,	// User area 1 3.3V supply
 		inout vdda2,	// User area 2 3.3V supply
@@ -47,36 +25,34 @@ module clusterv_tile(
 		inout vssd1,	// User area 1 digital ground
 		inout vssd2,	// User area 2 digital ground
 `endif
+`endif
 		input			clock,
 		input			reset,
-		input[31:0]		hartid,
-		input[31:0]     resvec,
-		/*
-		output[31:0]	i_adr,
-		output[31:0]	i_dat_w,
-		input[31:0]		i_dat_r,
-		output			i_cyc,
-		input			i_err,
-		output[3:0]		i_sel,
-		output			i_stb,
-		input			i_ack,
-		output			i_we,
-		output[0:0]		i_tgd_w,
-		input[0:0]		i_tgd_r,
-		output[0:0]		i_tga,
-		output[3:0]		i_tgc,
-		
-		output			sram_csb,
-		output			sram_web,
-		output[3:0]		sram_wmask,
-		output[7:0]		sram_addr,
-		output[31:0]	sram_dat_w,
-		input[31:0]		sram_dat_r,
-		 */
+		input			sys_reset,
+		input			cfg_sclk,
+		input			cfg_sdi,
+		output			cfg_sdo,
 		`WB_TAG_INITIATOR_PORT(i_, 32, 32, 1, 1, 4),
 		`SKY130_OPENRAM_RW_INITIATOR_PORT(sram_, 8, 32),
 		input			irq
 		);
+	
+	// Configuration registers
+	reg[31:0]			resvec;
+	reg[31:0]			hartid;
+	
+	assign cfg_sdo = hartid[0];
+	
+	always @(posedge cfg_sclk or posedge sys_reset) begin
+		if (sys_reset) begin
+			resvec <= 32'h80000000;
+			hartid <= HARTID;
+		end else begin
+			hartid <= {resvec[0], hartid[31:1]};
+			resvec <= {cfg_sdi, resvec[31:1]};
+		end
+	end
+	
 	
 	`WB_TAG_WIRES(core2ic_, 32, 32, 1, 1, 4);
 	`WB_TAG_WIRES(ic2sram_, 32, 32, 1, 1, 4);
@@ -133,12 +109,39 @@ module clusterv_tile(
 		end
 	end
 	
+//	`SKY130_OPENRAM_RW_WIRES(sram_, 8, 32);
+	
 	assign sram_csb        = ~(ic2sram_cyc && ic2sram_stb);
 	assign sram_web        = ~(ic2sram_cyc && ic2sram_stb && ic2sram_we);
 	assign sram_wmask      = ic2sram_sel; 
 	assign sram_addr       = ic2sram_adr[9:2];
 	assign sram_dat_w      = ic2sram_dat_w;
 	assign ic2sram_dat_r   = sram_dat_r;
+	
+//	// Register RAM for now
+//	reg[31:0]				ram[63:0];
+//
+//	reg[5:0]		addr_r;
+//	always @(posedge clock) begin
+//		addr_r <= ic2sram_adr[9:2];
+//		
+//		if (!sram_csb & !sram_web) begin
+//			if (sram_wmask[3]) begin
+//				ram[ic2sram_adr[7:2]][31:24] <= sram_dat_w[31:24];
+//			end
+//			if (sram_wmask[2]) begin
+//				ram[ic2sram_adr[7:2]][23:16] <= sram_dat_w[23:16];
+//			end
+//			if (sram_wmask[1]) begin
+//				ram[ic2sram_adr[7:2]][15:8] <= sram_dat_w[15:8];
+//			end
+//			if (sram_wmask[0]) begin
+//				ram[ic2sram_adr[7:2]][7:0] <= sram_dat_w[7:0];
+//			end
+//		end
+//	end
+//	
+//	assign sram_dat_r = ram[addr_r];
 	
 endmodule
 

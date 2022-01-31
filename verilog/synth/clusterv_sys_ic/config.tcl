@@ -24,17 +24,19 @@ set ::env(CLOCK_PERIOD) "30"
 
 set ::env(FP_SIZING) absolute
 #set ::env(DIE_AREA) "0 0 1000 70"
-set ::env(DIE_AREA) "0 0 400 400"
+set ::env(DIE_AREA) "0 0 1200 400"
 #set ::env(CELL_PAD) 4
 set ::env(DESIGN_IS_CORE) 0
 
-set ::env(VDD_NETS) [list {vccd1} {vccd2} {vdda1} {vdda2}]
-set ::env(GND_NETS) [list {vssd1} {vssd2} {vssa1} {vssa2}]
+#set ::env(VDD_NETS) [list {vccd1} {vccd2} {vdda1} {vdda2}]
+#set ::env(GND_NETS) [list {vssd1} {vssd2} {vssa1} {vssa2}]
+set ::env(VDD_NETS) [list {vccd1}]
+set ::env(GND_NETS) [list {vssd1}]
 
-set ::env(FP_PIN_ORDER_CFG) $::env(SYNTH_DIR)/pin_order.cfg
+#set ::env(FP_PIN_ORDER_CFG) $::env(SYNTH_DIR)/pin_order.cfg
 
 #set ::env(PL_BASIC_PLACEMENT) 1
-set ::env(PL_TARGET_DENSITY) 0.32
+set ::env(PL_TARGET_DENSITY) 0.15
 #set ::env(PL_RANDOM_GLB_PLACEMENT) 1
 
 # If you're going to use multiple power domains, then keep this disabled.

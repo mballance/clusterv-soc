@@ -22,10 +22,11 @@ module clusterv_periph_subsys(
     	inout vssd1,	// User area 1 digital ground
     	inout vssd2,	// User area 2 digital ground
 `endif
-		input		clock,
-		input		reset,
-		`WB_TAG_TARGET_PORT(regs_, 16, 32, 1, 1, 4),
-		`WB_TAG_INITIATOR_PORT(dma_, 32, 32, 1, 1, 4),
+		input		mgmt_clock,
+		input		mgmt_reset,
+		`WB_TARGET_PORT(mgmt_, 32, 32),
+		`WB_TARGET_PORT(regs_, 16, 32),
+		`WB_INITIATOR_PORT(dma_, 32, 32),
 		output[3:0]	core_irq,
 		output		spi0_sck,
 		output		spi0_sdo,
@@ -34,7 +35,13 @@ module clusterv_periph_subsys(
 		output		spi1_sdo,
 		input		spi1_sdi,
 		output		uart_tx,
-		input		uart_rx
+		input		uart_rx,
+		output		sys_clock,
+		output		sys_reset,
+		output		core_reset,
+		output		cfg_sclk,
+		output		cfg_sdo,
+		input		cfg_sdi		
 		);
 
 	localparam TARGET_IDX_LOCAL_INTC0 = 0;
@@ -62,7 +69,7 @@ module clusterv_periph_subsys(
 	localparam IRQ_IDX_DMA  = (IRQ_IDX_UART+1);
 	localparam N_IRQ = (IRQ_IDX_DMA+1);
 	wire[N_IRQ-1:0]			periph_irq;
-
+	
 	`WB_WIRES_ARR(ic2periph_, 16, 32, N_TARGETS);
 	`WB_WIRES(error_t_, 16, 32);
 	wb_interconnect_1xN_pt #(
@@ -92,11 +99,29 @@ module clusterv_periph_subsys(
 				16'h1000		// DMA
 			})
 		) u_periph_ic (
-		.clock       (clock      ), 
-		.reset       (reset      ), 
+		.clock       (sys_clock      ), 
+		.reset       (sys_reset      ), 
 		`WB_CONNECT(t_, regs_),
 		`WB_CONNECT(i_, ic2periph_),
 		`WB_CONNECT(pt_, error_t_));
+
+	`WB_WIRES_ARR(i2sys_, 32, 32, 2);
+	wb_interconnect_NxN #(
+		.WB_ADDR_WIDTH  (32 ), 
+		.WB_DATA_WIDTH  (32 ), 
+		.N_INITIATORS   (2  ), 
+		.N_TARGETS      (1     ), 
+		.T_ADR_MASK     ({
+				32'h00000000
+		}), 
+		.T_ADR          ({
+				32'h00000000
+		})
+		) wb_interconnect_NxN (
+		.clock          (sys_clock     ), 
+		.reset          (sys_reset     ), 
+		`WB_CONNECT( , i2sys_),
+		`WB_CONNECT(t, dma_));
 
 	wire global_irq;
 	generate
@@ -106,8 +131,8 @@ module clusterv_periph_subsys(
 				.N_SRCS   (1   ), 
 				.EN_MASK  ('b1 )
 			) u_local_intc (
-				.clock    (clock   ), 
-				.reset    (reset   ), 
+				.clock    (sys_clock   ), 
+				.reset    (sys_reset   ), 
 				`WB_CONNECT_ARR(r_, ic2periph_, TARGET_IDX_LOCAL_INTC0+local_intc_i, 16, 32),
 				.src      (global_irq            ), 
 				.irq      (core_irq[local_intc_i]));
@@ -117,8 +142,8 @@ module clusterv_periph_subsys(
 	fwpic_wb #(
 		.N_IRQ     (N_IRQ    )
 		) u_pic (
-		.clock     (clock       ), 
-		.reset     (reset       ), 
+		.clock     (sys_clock       ), 
+		.reset     (sys_reset       ), 
 		`WB_CONNECT_ARR(rt_, ic2periph_, TARGET_IDX_PIC, 16, 32),
 		.int_o     (global_irq  ), 
 		.irq       (periph_irq  ));
@@ -129,8 +154,8 @@ module clusterv_periph_subsys(
 	assign error_t_dat_r = 32'hdeadbeef;
 
 	fwspi_initiator u_spi0 (
-		.clock     (clock    ), 
-		.reset     (reset    ), 
+		.clock     (sys_clock    ), 
+		.reset     (sys_reset    ), 
 		`WB_CONNECT_ARR(rt_, ic2periph_, TARGET_IDX_SPI0, 16, 32),
 		.inta      (periph_irq[IRQ_IDX_SPI0] ), 
 		.tx_ready  (periph_dmareq[DMAREQ_IDX_SPI0_TX] ), 
@@ -140,8 +165,8 @@ module clusterv_periph_subsys(
 		.miso      (spi0_sdi ));
 	
 	fwspi_initiator u_spi1 (
-		.clock     (clock    ), 
-		.reset     (reset    ), 
+		.clock     (sys_clock    ), 
+		.reset     (sys_reset    ), 
 		`WB_CONNECT_ARR(rt_, ic2periph_, TARGET_IDX_SPI1, 16, 32),
 		.inta      (periph_irq[IRQ_IDX_SPI1] ), 
 		.tx_ready  (periph_dmareq[DMAREQ_IDX_SPI1_TX] ), 
@@ -151,8 +176,8 @@ module clusterv_periph_subsys(
 		.miso      (spi1_sdi ));
 	
 	fwuart_16550_wb u_uart (
-		.clock     (clock    ), 
-		.reset     (reset    ), 
+		.clock     (sys_clock    ), 
+		.reset     (sys_reset    ), 
 		`WB_CONNECT_ARR(rt_, ic2periph_, TARGET_IDX_UART, 16, 32),
 		.irq       (periph_irq[IRQ_IDX_UART] ), 
 		.tx_o      (uart_tx     ), 
@@ -169,10 +194,10 @@ module clusterv_periph_subsys(
 	fwperiph_dma_wb #(
 		.ch_count      (8            )
 		) u_dma (
-		.clock         (clock        ), 
-		.reset         (reset        ), 
+		.clock         (sys_clock        ), 
+		.reset         (sys_reset        ), 
 		`WB_CONNECT_ARR(rt_, ic2periph_, TARGET_IDX_DMA, 16, 32),
-		`WB_CONNECT(i0_, dma_),
+		`WB_CONNECT_ARR(i0_, i2sys_, 1, 32, 32),
 		`WB_CONNECT(i1_, dma_stub_),
 		.dma_req_i     (periph_dmareq ), 
 		/* TODO:
@@ -182,6 +207,18 @@ module clusterv_periph_subsys(
 		 */
 		.inta_o        (periph_irq[IRQ_IDX_DMA] )
 		);
+	
+	clusterv_mgmt_if u_mgmt_if (
+		.mgmt_clock            (mgmt_clock           ), 
+		.mgmt_reset            (mgmt_reset           ), 
+		`WB_CONNECT(mgmt_, mgmt_),
+		`WB_CONNECT_ARR(sys_, i2sys_, 0, 32, 32),
+		.sys_clock             (sys_clock            ), 
+		.sys_reset             (sys_reset            ), 
+		.core_reset            (core_reset           ), 
+		.cfg_sclk              (cfg_sclk             ), 
+		.cfg_sdo               (cfg_sdo              ), 
+		.cfg_sdi               (cfg_sdi              ));
 
 endmodule
 

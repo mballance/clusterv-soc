@@ -24,7 +24,8 @@ module clusterv_main_sram_sky130_openram(
 		`GENERIC_SRAM_BYTE_EN_TARGET_PORT(t_, 10, 32)
 		);
 
-	sky130_sram_4kbyte_1rw1r_32x1024_8 #(
+`ifdef UNDEFINED
+	sky130_sram_2kbyte_1rw1r_32x512_8 #(
 			.VERBOSE(0)
 		) u_main_sram(
 			`ifdef USE_POWER_PINS
@@ -44,6 +45,31 @@ module clusterv_main_sram_sky130_openram(
 			.csb1(1'b1),
 			.addr1(8'h0)
 		);	
+`else
+		reg[31:0]			ram[5:0];
+		reg[5:0]			addr_r;
+		
+		assign t_read_data = ram[addr_r];
+		
+		always @(posedge clock) begin
+			addr_r <= t_addr[7:2];
+		
+			if (t_write_en) begin
+				if (t_byte_en[0]) begin
+					ram[t_addr[7:2]][7:0] <= t_write_data[7:0];
+				end
+				if (t_byte_en[1]) begin
+					ram[t_addr[7:2]][15:8] <= t_write_data[15:8];
+				end
+				if (t_byte_en[2]) begin
+					ram[t_addr[7:2]][23:16] <= t_write_data[23:16];
+				end
+				if (t_byte_en[3]) begin
+					ram[t_addr[7:2]][31:24] <= t_write_data[31:24];
+				end
+			end
+		end
+`endif
 
 endmodule
 

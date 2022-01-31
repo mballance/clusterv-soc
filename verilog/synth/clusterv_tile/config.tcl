@@ -15,37 +15,45 @@
 
 set script_dir [file dirname [file normalize [info script]]]
 
+# set ::env(STD_CELL_LIBRARY_OPT) "sky130_fd_sc_hd"
+
 # Disable streaming GDS using klayout
-set ::env(RUN_KLAYOUT) 0
+#set ::env(RUN_KLAYOUT) 0
 
 set ::env(CLOCK_PORT) "clock"
 set ::env(CLOCK_NET) "clock"
 set ::env(CLOCK_PERIOD) "30"
 
 set ::env(FP_SIZING) absolute
-set ::env(DIE_AREA) "0 0 600 500"
+set ::env(DIE_AREA) "0 0 500 600"
 #set ::env(CELL_PAD) 4
-set ::env(DESIGN_IS_CORE) 0
 
-set ::env(VDD_NETS) [list {vccd1} {vccd2} {vdda1} {vdda2}]
-set ::env(GND_NETS) [list {vssd1} {vssd2} {vssa1} {vssa2}]
+# set ::env(DESIGN_IS_CORE) 0
 
-#set ::env(FP_PIN_ORDER_CFG) $script_dir/pin_order.cfg
+# set ::env(VDD_NETS) [list {vccd1} {vccd2} {vdda1} {vdda2}]
+# set ::env(GND_NETS) [list {vssd1} {vssd2} {vssa1} {vssa2}]
+
+#set ::env(FP_PIN_ORDER_CFG) $::env(SYNTH_DIR)/pin_order.cfg
 
 #set ::env(PL_BASIC_PLACEMENT) 1
-set ::env(PL_TARGET_DENSITY) 0.50
+#set ::env(PL_TARGET_DENSITY) 0.45
+#set ::env(PL_TARGET_DENSITY) 0.51
+set ::env(PL_TARGET_DENSITY) 0.70
 
 # If you're going to use multiple power domains, then keep this disabled.
-set ::env(RUN_CVC) 0
+#set ::env(RUN_CVC) 0
 
 ### Routing
 # Add routing obstruction on met5 to avoid having shorts on the top level where met5 power straps intersect with the macro
-set ::env(GLB_RT_OBS)               "met5 $::env(DIE_AREA)"
-set ::env(GLB_RT_MAXLAYER)          5
-set ::env(GLB_RT_ADJUSTMENT)        0.25
+#set ::env(GLB_RT_OBS)               "met5 $::env(DIE_AREA)"
+
+#set ::env(GLB_RT_MAXLAYER)          5
+
+#set ::env(GLB_RT_ADJUSTMENT)        0.25
 
 ### Diode Insertion
-set ::env(DIODE_INSERTION_STRATEGY) "5"
+#set ::env(DIODE_INSERTION_STRATEGY) "3"
+#set ::env(GLB_RT_MAX_DIODE_INS_ITERS) "3"
 
 set ::env(ROUTING_CORES) 10
 #set ::env(ROUTING_OPT_ITERS) 80

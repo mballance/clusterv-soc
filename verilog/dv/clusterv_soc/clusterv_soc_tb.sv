@@ -86,10 +86,8 @@ module clusterv_soc_tb(input wire clock);
 		.vssd1(vssd1),	// User area 1 digital ground
 		.vssd2(vssd2),	// User area 2 digital ground
 `endif						
-		.clock       (clock      	), 
-		.sys_reset   (sys_reset     ), 
-		.core_reset  (core_reset    ), 
-		.resvec      (resvec        ),
+		.mgmt_clock  (clock      	), 
+		.mgmt_reset  (sys_reset     ), 
 		`WB_CONNECT(mgmt_t_, wb_bfm2dut_),
 		.flash_sck   (flash_sck ), 
 		.flash_csn   (flash_csn  ), 

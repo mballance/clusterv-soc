@@ -49,9 +49,9 @@ set ::env(RUN_KLAYOUT_DRC) 0
 # magic drc checking on the sram block shows millions of false errors
 set ::env(MAGIC_DRC_USE_GDS) 0
 
-set ::env(PL_RANDOM_GLB_PLACEMENT) 1
-set ::env(MACRO_PLACEMENT_CFG) $::env(SYNTH_DIR)/macro.cfg
-set ::env(CLOCK_TREE_SYNTH) 0
+#set ::env(PL_RANDOM_GLB_PLACEMENT) 1
+#set ::env(MACRO_PLACEMENT_CFG) $::env(SYNTH_DIR)/macro.cfg
+#set ::env(CLOCK_TREE_SYNTH) 0
 set ::env(ROUTING_CORES) 10
-set ::env(PL_TARGET_DENSITY)     0.01
+#set ::env(PL_TARGET_DENSITY)     0.01
 

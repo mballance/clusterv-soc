@@ -13,9 +13,9 @@
 `define CLUSTERV_TILE_SRAM_MODULE clusterv_tile_sram
 `endif
 
-`define STUB_PERIPH_SUBSYS
+//`define STUB_PERIPH_SUBSYS
 // `define STUB_FLASH
-`define STUB_MEMC
+//`define STUB_MEMC
 
 /**
  * Module: clusterv_soc
@@ -33,10 +33,8 @@ module clusterv_soc(
 			inout vssd1,	// User area 1 digital ground
 			inout vssd2,	// User area 2 digital ground
 		`endif		
-		input			clock,
-		input			sys_reset,
-		input			core_reset,
-		input[31:0]		resvec,
+		input			mgmt_clock,
+		input			mgmt_reset,
 		`WB_TARGET_PORT(mgmt_t_, 32, 32),
 		output			flash_sck,
 		output			flash_csn,
@@ -55,6 +53,8 @@ module clusterv_soc(
 	localparam N_TILES = 4;
 //	localparam N_TILES = 1;
 	
+	wire sys_clock, sys_reset, core_reset;
+	
 	wire[N_TILES-1:0] irq = 0;
 	
 	localparam INITIATOR_IDX_MGMT = N_TILES;
@@ -72,12 +72,12 @@ module clusterv_soc(
 	
 	// Connect the mgmt interface into the main interconnect
 	`WB_ASSIGN_WIRES2ARR(init2ic_, mgmt_t_, INITIATOR_IDX_MGMT, 32, 32);
-
+	
 	generate
 		genvar tile_i;
 		for (tile_i=0; tile_i<N_TILES; tile_i=tile_i+1) begin : tile
 			wire[31:0] hartid = tile_i;
-			clusterv_tile u_tile (
+			clusterv_tile #(.HARTID(tile_i)) u_tile (
 					`ifdef USE_POWER_PINS
 						.vdda1(vdda1),	// User area 1 3.3V supply
 						.vdda2(vdda2),	// User area 2 3.3V supply
@@ -88,16 +88,18 @@ module clusterv_soc(
 						.vssd1(vssd1),	// User area 1 digital ground
 						.vssd2(vssd2),	// User area 2 digital ground
 					`endif			
-					.clock       (clock         ), 
+					.clock       (sys_clock   ), 
 					.reset       (core_reset  ), 
-					.hartid      (hartid        ), 
-					.resvec      (resvec        ), 
+					.sys_reset   (sys_reset   ), 
+					.cfg_sclk(1'b0),
+					.cfg_sdi(1'b0),
 					`WB_TAG_CONNECT_ARR(i_, init2ic_, tile_i, 32, 32, 1, 1, 4),
 					`SKY130_OPENRAM_RW_CONNECT_ARR(sram_, tile2sram_, tile_i, 8, 32),
 					.irq         (irq[tile_i]   ));
 
 			//	assign io_out = tile0ic_adr;
 			//	assign tile0ic_dat_r = io_in;
+`ifdef UNDEFINED
 			sky130_sram_1kbyte_1rw1r_32x256_8 #(
 					.VERBOSE(0)
 				) u_tile_sram(
@@ -106,7 +108,7 @@ module clusterv_soc(
 						.vssd1(vssd1),
 					`endif
 					// Port 0: RW
-					.clk0(clock),
+					.clk0(sys_clock),
 					.csb0(tile2sram_csb[tile_i]),
 					.web0(tile2sram_web[tile_i]),
 					.wmask0(tile2sram_wmask[4*tile_i+:4]),
@@ -118,7 +120,7 @@ module clusterv_soc(
 			.csb1(1'b1),
 			.addr1(8'h0) */
 				);	
-`ifdef UNDEFINED
+`endif
 			`CLUSTERV_TILE_SRAM_MODULE u_tile_sram(
 					`ifdef USE_POWER_PINS
 						.vdda1(vdda1),	// User area 1 3.3V supply
@@ -131,11 +133,10 @@ module clusterv_soc(
 						.vssd2(vssd2),	// User area 2 digital ground
 					`endif			
 
-					.clock(clock),
+					.clock(sys_clock),
 					.reset(sys_reset),
 					`SKY130_OPENRAM_RW_CONNECT_ARR(t_, tile2sram_, tile_i, 8, 32)
 				);
-`endif
 		end
 	endgenerate
 
@@ -161,7 +162,7 @@ module clusterv_soc(
 				32'h20000000  // Periph
 				})
 		) u_core_ic (
-		.clock         (clock        ), 
+		.clock         (sys_clock        ), 
 		.reset         (sys_reset        ), 
 		`WB_TAG_CONNECT( , init2ic_),
 		`WB_TAG_CONNECT(t, ic2targ_));
@@ -178,7 +179,7 @@ module clusterv_soc(
 			.ADR_WIDTH     (16           ), 
 			.DAT_WIDTH     (32           )
 		) u_sram_ctrl (
-			.clock         (clock        ), 
+			.clock         (sys_clock        ), 
 			.reset         (sys_reset        ), 
 			`WB_TAG_CONNECT_ARR(t_, ic2targ_, TARGET_IDX_SRAM, 32, 32, 1, 1, 4),
 			`GENERIC_SRAM_BYTE_EN_CONNECT(i_, sram_));	
@@ -188,7 +189,7 @@ module clusterv_soc(
 		genvar main_sram_i;
 		for (main_sram_i=0; main_sram_i<N_MAIN_SRAM; main_sram_i=main_sram_i+1) begin : main_sram
 			`CLUSTERV_MAIN_SRAM_MODULE u_main_sram (
-					.clock         (clock        	   ), 
+					.clock         (sys_clock        	   ), 
 					.reset         (sys_reset        	   ), 
 					.t_addr        (sram_addr  ), 
 					.t_read_data   (banked_sram_read_data[32*main_sram_i+:32]),
@@ -215,7 +216,7 @@ module clusterv_soc(
 	assign ic2targ_ack[TARGET_IDX_FLASH] = 1'b0;
 `else
 	fwspi_memio_wb u_flash (
-		.clock          (clock         ), 
+		.clock          (sys_clock         ), 
 		.reset          (sys_reset         ), 
 		`WB_CONNECT(cfg_, flashcfg_),
 		`WB_CONNECT_ARR(flash_, ic2targ_, TARGET_IDX_FLASH, 32, 32),
@@ -276,8 +277,11 @@ module clusterv_soc(
 		.vssd1(vssd1),	// User area 1 digital ground
 		.vssd2(vssd2),	// User area 2 digital ground
 `endif						
-		.clock       (clock      ), 
-		.reset       (sys_reset      ), 
+		.mgmt_clock  (mgmt_clock ),
+		.mgmt_reset  (mgmt_reset ),
+		`WB_CONNECT  (mgmt_, mgmt_t_ ),
+//		.sys_clock       (sys_clock      ), 
+//		.reset       (sys_reset      ), 
 		`WB_CONNECT_ARR(regs_, ic2targ_, TARGET_IDX_PERIPH, 32, 32),
 		`WB_CONNECT_ARR(dma_, init2ic_, INITIATOR_IDX_DMA, 32, 32),
 		.spi0_sck    (spi0_sck   ), 
@@ -287,7 +291,11 @@ module clusterv_soc(
 		.spi1_sdo    (spi1_sdo   ), 
 		.spi1_sdi    (spi1_sdi   ), 
 		.uart_tx     (uart_tx    ), 
-		.uart_rx     (uart_rx    ));
+		.uart_rx     (uart_rx    ),
+		.sys_clock   (sys_clock  ),
+		.sys_reset   (sys_reset  ),
+		.core_reset  (core_reset )
+		);
 `endif
 	
 endmodule

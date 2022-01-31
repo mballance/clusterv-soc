@@ -13,6 +13,8 @@ include $(PACKAGES_DIR)/fwprotocol-defs/verilog/rtl/defs_rules.mk
 #MKDV_LEF_FILES += $(PACKAGES_DIR)/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.lef
 #MKDV_GDS_FILES += $(PACKAGES_DIR)/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.gds
 
+include $(CLUSTERV_SOC_DIR)/verilog/rtl/defs_rules.mk
+
 include $(DV_MK)
 else # Rules
 include $(DV_MK)
