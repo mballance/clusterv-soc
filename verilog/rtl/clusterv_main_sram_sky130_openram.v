@@ -46,26 +46,27 @@ module clusterv_main_sram_sky130_openram(
 			.addr1(8'h0)
 		);	
 `else
-		reg[31:0]			ram[5:0];
+		localparam ADDR_BITS = 6;
+		reg[31:0]			ram[ADDR_BITS-1:0];
 		reg[5:0]			addr_r;
 		
 		assign t_read_data = ram[addr_r];
 		
 		always @(posedge clock) begin
-			addr_r <= t_addr[7:2];
+			addr_r <= t_addr[ADDR_BITS-1:0];
 		
 			if (t_write_en) begin
 				if (t_byte_en[0]) begin
-					ram[t_addr[7:2]][7:0] <= t_write_data[7:0];
+					ram[t_addr[ADDR_BITS-1:0]][7:0] <= t_write_data[7:0];
 				end
 				if (t_byte_en[1]) begin
-					ram[t_addr[7:2]][15:8] <= t_write_data[15:8];
+					ram[t_addr[ADDR_BITS-1:0]][15:8] <= t_write_data[15:8];
 				end
 				if (t_byte_en[2]) begin
-					ram[t_addr[7:2]][23:16] <= t_write_data[23:16];
+					ram[t_addr[ADDR_BITS-1:0]][23:16] <= t_write_data[23:16];
 				end
 				if (t_byte_en[3]) begin
-					ram[t_addr[7:2]][31:24] <= t_write_data[31:24];
+					ram[t_addr[ADDR_BITS-1:0]][31:24] <= t_write_data[31:24];
 				end
 			end
 		end

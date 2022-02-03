@@ -57,8 +57,9 @@ module clusterv_soc(
 	
 	wire[N_TILES-1:0] irq = 0;
 	
-	localparam INITIATOR_IDX_MGMT = N_TILES;
-	localparam INITIATOR_IDX_DMA  = (INITIATOR_IDX_MGMT+1);
+//	localparam INITIATOR_IDX_MGMT = N_TILES;
+//	localparam INITIATOR_IDX_DMA  = (INITIATOR_IDX_MGMT+1);
+	localparam INITIATOR_IDX_DMA  = N_TILES;
 	localparam N_INITIATORS       = INITIATOR_IDX_DMA+1;
 	
 	localparam TARGET_IDX_SRAM = 0;
@@ -71,7 +72,8 @@ module clusterv_soc(
 	`WB_TAG_WIRES_ARR(ic2targ_, 32, 32, 1, 1, 4, N_TARGETS);
 	
 	// Connect the mgmt interface into the main interconnect
-	`WB_ASSIGN_WIRES2ARR(init2ic_, mgmt_t_, INITIATOR_IDX_MGMT, 32, 32);
+//	assign mgmt_t_ack = 1'b0;
+//	`WB_ASSIGN_WIRES2ARR(init2ic_, mgmt_t_, INITIATOR_IDX_MGMT, 32, 32);
 	
 	generate
 		genvar tile_i;

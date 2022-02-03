@@ -9,7 +9,8 @@ CLUSTERV_SOC_DIR := $(abspath $(TEST_DIR)/../../..)
 MKDV_TOOL ?= icarus
 MKDV_TIMEOUT ?= 4ms
 CLUSTERV_SOC_SRAM ?= openram
-BOOT ?= flash
+#BOOT ?= flash
+BOOT ?= ram
 
 MKDV_PLUGINS += cocotb pybfms
 PYBFMS_MODULES += riscv_debug_bfms spi_bfms generic_sram_bfms

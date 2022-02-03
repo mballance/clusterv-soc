@@ -127,9 +127,14 @@ class ClustervSocTestBase(object):
 #                             self.spi_memio.data[base+i] = b
 #                         
         print("Done Loading")
+        
     
     async def run(self):
-        await cocotb.triggers.Timer(1, 'ms')
+        await self.mgmt_bfm.write(0x10000000, 0x55aaeeff, 0xF)
+#        await self.mgmt_bfm.write(0x80000000, 0x55aaeeff, 0xF)
+        await self.mgmt_bfm.write(0x10000004, 0x00000000, 0xF)
+        await cocotb.triggers.Timer(100, 'us')
+#        await cocotb.triggers.Timer(1, 'ms')
         pass
 
 @cocotb.test()

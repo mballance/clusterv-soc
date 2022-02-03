@@ -111,8 +111,15 @@ module clusterv_mgmt_if #(
 			sysaddr_page <= 8'h80;
 			core_reset_r <= 1'b1;
 		end else begin
-			if (localregs_cyc && localregs_stb) begin
-				resvec_r <= localregs_dat_w;
+			if (localregs_cyc && localregs_stb && localregs_we) begin
+				case (localregs_adr[3:2])
+					2'b00: begin
+						resvec_r <= localregs_dat_w;
+					end
+					2'b01: begin
+						core_reset_r <= localregs_dat_w[0];
+					end
+				endcase
 			end
 		end
 	end

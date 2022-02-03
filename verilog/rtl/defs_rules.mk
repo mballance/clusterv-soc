@@ -20,8 +20,8 @@ MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/user_project_wrapper.v
 MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/user_proj_inner.v
 
 ifeq (openram,$(CLUSTERV_SOC_SRAM))
-#MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/clusterv_tile_sram_sky130_openram.v
-#MKDV_VL_DEFINES += CLUSTERV_TILE_SRAM_MODULE=clusterv_tile_sram_sky130_openram
+MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/clusterv_tile_sram_sky130_openram.v
+MKDV_VL_DEFINES += CLUSTERV_TILE_SRAM_MODULE=clusterv_tile_sram_sky130_openram
 MKDV_VL_SRCS += $(CLUSTERV_SOC_RTLDIR)/clusterv_main_sram_sky130_openram.v
 MKDV_VL_DEFINES += CLUSTERV_MAIN_SRAM_MODULE=clusterv_main_sram_sky130_openram
 endif
